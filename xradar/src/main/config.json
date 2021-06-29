@@ -1,0 +1,28 @@
+{
+  "app": {
+    "bundleName": "com.orzangleli.radarview",
+    "vendor": "orzangleli",
+    "version": {
+      "code": 1000000,
+      "name": "1.0.0"
+    },
+    "apiVersion": {
+      "compatible": 5,
+      "target": 5,
+      "releaseType": "Release"
+    }
+  },
+  "deviceConfig": {
+  },
+  "module": {
+    "package": "com.orzangleli.radar",
+    "deviceType": [
+      "phone"
+    ],
+    "distro": {
+      "deliveryWithInstall": true,
+      "moduleName": "xradar",
+      "moduleType": "har"
+    }
+  }
+}

@@ -2,12 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/RadarView.iml" filepath="$PROJECT_DIR$/RadarView.iml" />
-      <module fileurl="file://$PROJECT_DIR$/XRadarView.iml" filepath="$PROJECT_DIR$/XRadarView.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/xradar/xradar.iml" filepath="$PROJECT_DIR$/xradar/xradar.iml" />
-      <module fileurl="file://$PROJECT_DIR$/xradar/xradar.iml" filepath="$PROJECT_DIR$/xradar/xradar.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/XRadarView.iml" filepath="$PROJECT_DIR$/.idea/modules/XRadarView.iml" group="XRadarView" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/entry/entry.iml" filepath="$PROJECT_DIR$/.idea/modules/entry/entry.iml" group="XRadarView/entry" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/xradar/xradar.iml" filepath="$PROJECT_DIR$/.idea/modules/xradar/xradar.iml" group="XRadarView/xradar" />
     </modules>
   </component>
 </project>

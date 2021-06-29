@@ -1,126 +1,136 @@
 package com.orzangleli.radar;
 
-import android.animation.ValueAnimator;
-import android.content.Context;
-import android.content.res.TypedArray;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.LinearGradient;
-import android.graphics.Matrix;
-import android.graphics.Paint;
-import android.graphics.Path;
-import android.graphics.Point;
-import android.graphics.Rect;
-import android.graphics.RectF;
-import android.graphics.Shader;
-import android.os.Build;
-import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
-import android.text.Layout;
-import android.text.SpannableString;
-import android.text.Spanned;
-import android.text.StaticLayout;
-import android.text.TextPaint;
-import android.text.style.AbsoluteSizeSpan;
-import android.text.style.ForegroundColorSpan;
-import android.util.AttributeSet;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.animation.LinearInterpolator;
+import ohos.agp.animation.Animator;
+import ohos.agp.animation.AnimatorValue;
+import ohos.agp.colors.RgbPalette;
+import ohos.agp.components.AttrSet;
+import ohos.agp.components.Component;
+import ohos.agp.render.*;
+import ohos.agp.text.SimpleTextLayout;
+import ohos.agp.utils.*;
+import ohos.app.Context;
+import ohos.hiviewdfx.HiLog;
+import ohos.hiviewdfx.HiLogLabel;
+import ohos.media.image.PixelMap;
+import ohos.media.image.common.Size;
+import ohos.multimodalinput.event.TouchEvent;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-/**
- * 雷达图控件
- * Created by lixiancheng on 2017/9/18.
- */
+public class XRadarView extends Component implements Component.DrawTask, Component.TouchEventListener {
 
-public class XRadarView extends View {
+    private static final String TAG = XRadarView.class.getSimpleName();
 
-    // 几边形雷达
+    private static final HiLogLabel LABEL_LOG = new HiLogLabel(3, 0xD000F00, TAG);
+
+    //attributes
+    private static final String ATTRIBUTE_COUNT = "count";
+    private static final String ATTRIBUTE_LAYER_COUNT = "layerCount";
+    private static final String ATTRIBUTE_DRAWABLE_SIZE = "mDrawableSize";
+    private static final String ATTRIBUTE_DRAWABLE_PADDING = "mDrawablePadding";
+    private static final String ATTRIBUTE_DESC_PADDING = "descPadding";
+    private static final String ATTRIBUTE_TITLE_SIZE = "titleSize";
+    private static final String ATTRIBUTE_DATA_SIZE = "dataSize";
+    private static final String ATTRIBUTE_RADAR_PERCENT = "radarPercent";
+    private static final String ATTRIBUTE_START_COLOR = "startColor";
+    private static final String ATTRIBUTE_END_COLOR = "endColor";
+    private static final String ATTRIBUTE_COBWEB_COLOR = "cobwebColor";
+    private static final String ATTRIBUTE_DATA_COLOR = "dataColor";
+    private static final String ATTRIBUTE_SINGLE_COLOR = "singleColor";
+    private static final String ATTRIBUTE_TITLE_COLOR = "titleColor";
+    private static final String ATTRIBUTE_POINT_COLOR = "pointColor";
+    private static final String ATTRIBUTE_BORDER_COLOR = "borderColor";
+    private static final String ATTRIBUTE_RADIUS_COLOR = "radiusColor";
+    private static final String ATTRIBUTE_BOUNDARY_WIDTH = "boundaryWidth";
+    private static final String ATTRIBUTE_POINT_RADIUS = "pointRadius";
+    private static final String ATTRIBUTE_ENABLED_BORDER = "enabledBorder";
+    private static final String ATTRIBUTE_ENABLED_ANIMATION = "enabledAnimation";
+    private static final String ATTRIBUTE_ENABLED_SHOW_POINT = "enabledShowPoint";
+    private static final String ATTRIBUTE_ENABLED_POLYGON = "enabledPolygon";
+    private static final String ATTRIBUTE_ENABLED_SHADE = "enabledShade";
+    private static final String ATTRIBUTE_ENABLED_RADIUS = "enabledRadius";
+    private static final String ATTRIBUTE_ENABLED_TEXT = "enabledText";
+    private static final String ATTRIBUTE_ANIMATION_DURATION = "animDuration";
+
+    // Several-sided radar
     private int count = 5;
-
-    private int layerCount = 6;  // 层数
+    private int layerCount = 6;  // Number of layer
     private int drawableSize = 40;
     private int drawablePadding = 10;
     private int descPadding = 5;
-
     private int titleSize = 40;
     private int dataSize = 30;
 
     private float radarPercent = 0.7f;
 
-    private int startColor = Color.parseColor("#80FF0000");
-    private int endColor = Color.parseColor("#8000FF00");
-    // 蜘蛛网线的颜色
-    private int cobwebColor;
-    // 圆心与各顶点连线颜色
-    private int lineColor;
-    // 数据值文本颜色
-    private int dataColor;
-    // 如果不是多色区域，是单一的颜色
-    private int singleColor;
+    private Color startColor = new Color(RgbPalette.parse("#80FF0000"));
+    private Color endColor = new Color(RgbPalette.parse("#8000FF00"));
+    // The color of the cobweb line
+    private Color cobwebColor;
+    // The text color of the data value
+    private Color dataColor;
+    // If it is not a multicolored area, it is a single color
+    private Color singleColor;
 
-    // 标题文本颜色
-    private int titleColor;
-    // 圆点颜色
-    private int pointColor;
-    // 圆点半径大小
+    // The color of the title text
+    private Color titleColor;
+    // Dot color
+    private Color pointColor;
+    // The size of the dot radius
     private int pointRadius;
-    // 边界线颜色
-    private int borderColor;
-    // 边界线的宽度
+    // The color of the boundary line
+    private Color borderColor;
+    // The width of the boundary line
     private int boundaryWidth;
-    // 半径线的颜色
-    private int radiusColor;
-    // 雷达图渐变颜色数组
-    private int[] shaderColors;
-    // 雷达图渐变颜色各种颜色分布的位置
+    // The color of the radius line
+    private Color radiusColor;
+    // Radar chart gradient color array
+    private Color[] shaderColors;
+    // The location of various color distributions of radar map gradient colors
     private float[] shaderPositions;
 
 
-    // 是否画边界线
+    // Whether to draw a boundary line
     private boolean enabledBorder = false;
-    // 是否开启动画
+    // Whether to turn on the animation
     private boolean enabledAnimation = true;
-    // 动画时长
+    // The duration of the animation
     private int animDuration = 1000;
-    // 是否显示圆点
+    // Whether the dot is displayed
     private boolean enabledShowPoint = true;
-    // 是否绘制网格
+    // Whether to draw the grid
     private boolean enabledPolygon = true;
-    // 是否绘制渐变环
+    // Whether to draw a gradient ring
     private boolean enabledShade = true;
-    // 是否绘制半径
+    // Whether to draw the radius
     private boolean enabledRadius = true;
-    // 是否绘制文本
+    // Whether to draw the text
     private boolean enabledText = true;
-    // 是否将雷达区域绘制成渐变色
+    // Whether to paint the radar area as a gradient color
     private boolean enabledRegionShader = false;
 
 
-    private int MAX_TEXT_WIDTH;  // 文字最大允许宽度
+    private int MAX_TEXT_WIDTH;  // Text maximum allowable width
 
-    // 每条边对应的圆心角
+    // The center of the circle for each edge
     private float angle;
-    // 圆心x
+    // Round x
     private int centerX;
-    // 圆心y
+    // Round y
     private int centerY;
-    // 半径
+    // radius
     private float radius;
 
-    // 外轮廓是否是圆形
+    // Whether the outer outline is circular
     private boolean isCircle = false;
 
-    // 区域渐变shader
+    // Area gradient shader
     private Shader regionShader;
 
     private Paint cobwebPaint;
-    private Paint linePaint;
     private Paint dataPaint;
     private Paint singlePaint;
     private TextPaint titlePaint;
@@ -130,64 +140,71 @@ public class XRadarView extends View {
     private Paint borderPaint;
 
 
-    // 当前缩放比
+    // The current scale ratio
     private float currentScale;
 
     private List<Rect> titleRects;
 
-    // 图标
-    private int drawables[];
-    // 标题
-    CharSequence titles[];
-    // 每种属性的值（0~1.0）
-    double percents[];
-    // 各个标题下面的数值文本
-    CharSequence values[];
-    // 区域颜色
-    int colors[];
+    // icon
+    private int[] drawables;
+    // title
+    CharSequence[] titles;
+    // Value for each property (0 to 1.0)
+    double[] percents;
+    // Numeric text below each title
+    CharSequence[] values;
+    // The area color
+    int[] colors;
+
+    OnTitleClickListener onTitleClickListener;
 
     public XRadarView(Context context) {
         this(context, null, 0);
+        init(null);
     }
 
-    public XRadarView(Context context, @Nullable AttributeSet attrs) {
+    public XRadarView(Context context, @Nullable AttrSet attrs) {
         this(context, attrs, 0);
+        init(attrs);
     }
 
-    public XRadarView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public XRadarView(Context context, @Nullable AttrSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        TypedArray typedArray = context.getResources().obtainAttributes(attrs, R.styleable.XRadarView);
-        count = typedArray.getInteger(R.styleable.XRadarView_count, 6);
-        layerCount = typedArray.getInteger(R.styleable.XRadarView_layerCount, 6);
-        drawableSize = typedArray.getDimensionPixelSize(R.styleable.XRadarView_mDrawableSize, 40);
-        drawablePadding = typedArray.getDimensionPixelSize(R.styleable.XRadarView_mDrawablePadding, 10);
-        descPadding = typedArray.getDimensionPixelSize(R.styleable.XRadarView_descPadding, 5);
-        titleSize = typedArray.getDimensionPixelSize(R.styleable.XRadarView_titleSize, 40);
-        dataSize = typedArray.getDimensionPixelSize(R.styleable.XRadarView_dataSize, 30);
-        radarPercent = typedArray.getFloat(R.styleable.XRadarView_radarPercent, 0.7f);
-        startColor = typedArray.getColor(R.styleable.XRadarView_startColor, Color.parseColor("#80FFCC33"));
-        endColor = typedArray.getColor(R.styleable.XRadarView_endColor, Color.parseColor("#80FFFFCC"));
+        init(attrs);
+    }
 
-        cobwebColor = typedArray.getColor(R.styleable.XRadarView_cobwebColor, Color.parseColor("#80444444"));
-        lineColor = typedArray.getColor(R.styleable.XRadarView_lineColor, Color.parseColor("#80999999"));
-        dataColor = typedArray.getColor(R.styleable.XRadarView_dataColor, Color.parseColor("#00000000"));
-        singleColor = typedArray.getColor(R.styleable.XRadarView_singleColor, Color.parseColor("#80CC0000"));
-        titleColor = typedArray.getColor(R.styleable.XRadarView_titleColor, Color.parseColor("#80000000"));
-        pointColor = typedArray.getColor(R.styleable.XRadarView_pointColor, Color.parseColor("#80333366"));
-        borderColor = typedArray.getColor(R.styleable.XRadarView_borderColor, Color.parseColor("#80333366"));
-        radiusColor = typedArray.getColor(R.styleable.XRadarView_radiusColor, Color.parseColor("#80CCCCCC"));
-        boundaryWidth = typedArray.getDimensionPixelSize(R.styleable.XRadarView_boundaryWidth, 5);
+    private void init(AttrSet attrSet) {
 
-        pointRadius = typedArray.getDimensionPixelSize(R.styleable.XRadarView_pointRadius, 10);
-        enabledBorder = typedArray.getBoolean(R.styleable.XRadarView_enabledBorder, false);
-        enabledAnimation = typedArray.getBoolean(R.styleable.XRadarView_enabledAnimation, true);
-        enabledShowPoint = typedArray.getBoolean(R.styleable.XRadarView_enabledShowPoint, true);
-        enabledPolygon = typedArray.getBoolean(R.styleable.XRadarView_enabledPolygon, true);
-        enabledShade = typedArray.getBoolean(R.styleable.XRadarView_enabledShade, true);
-        enabledText = typedArray.getBoolean(R.styleable.XRadarView_enabledText, true);
-        animDuration = typedArray.getInteger(R.styleable.XRadarView_animDuration, 1000);
+        if (attrSet != null) {
+            count = attrSet.getAttr(ATTRIBUTE_COUNT).isPresent() ? attrSet.getAttr(ATTRIBUTE_COUNT).get().getIntegerValue() : 6;
+            layerCount = attrSet.getAttr(ATTRIBUTE_LAYER_COUNT).isPresent() ? attrSet.getAttr(ATTRIBUTE_LAYER_COUNT).get().getIntegerValue() : 6;
+            drawableSize = attrSet.getAttr(ATTRIBUTE_DRAWABLE_SIZE).isPresent() ? attrSet.getAttr(ATTRIBUTE_DRAWABLE_SIZE).get().getIntegerValue() : 40;
+            drawablePadding = attrSet.getAttr(ATTRIBUTE_DRAWABLE_PADDING).isPresent() ? attrSet.getAttr(ATTRIBUTE_DRAWABLE_PADDING).get().getIntegerValue() : 10;
+            descPadding = attrSet.getAttr(ATTRIBUTE_DESC_PADDING).isPresent() ? attrSet.getAttr(ATTRIBUTE_DESC_PADDING).get().getIntegerValue() : 5;
+            titleSize = attrSet.getAttr(ATTRIBUTE_TITLE_SIZE).isPresent() ? attrSet.getAttr(ATTRIBUTE_TITLE_SIZE).get().getIntegerValue() : 40;
+            dataSize = attrSet.getAttr(ATTRIBUTE_DATA_SIZE).isPresent() ? attrSet.getAttr(ATTRIBUTE_DATA_SIZE).get().getIntegerValue() : 30;
+            radarPercent = attrSet.getAttr(ATTRIBUTE_RADAR_PERCENT).isPresent() ? attrSet.getAttr(ATTRIBUTE_RADAR_PERCENT).get().getFloatValue() : 0.7f;
+            startColor = attrSet.getAttr(ATTRIBUTE_START_COLOR).isPresent() ? attrSet.getAttr(ATTRIBUTE_START_COLOR).get().getColorValue() : new Color(RgbPalette.parse("#80FFCC33"));
+            endColor = attrSet.getAttr(ATTRIBUTE_END_COLOR).isPresent() ? attrSet.getAttr(ATTRIBUTE_END_COLOR).get().getColorValue() : new Color(RgbPalette.parse("#80FFFFCC"));
+            cobwebColor = attrSet.getAttr(ATTRIBUTE_COBWEB_COLOR).isPresent() ? attrSet.getAttr(ATTRIBUTE_COBWEB_COLOR).get().getColorValue() : new Color(RgbPalette.parse("#80444444"));
+            dataColor = attrSet.getAttr(ATTRIBUTE_DATA_COLOR).isPresent() ? attrSet.getAttr(ATTRIBUTE_DATA_COLOR).get().getColorValue() : new Color(RgbPalette.parse("#00000000"));
+            singleColor = attrSet.getAttr(ATTRIBUTE_SINGLE_COLOR).isPresent() ? attrSet.getAttr(ATTRIBUTE_SINGLE_COLOR).get().getColorValue() : new Color(RgbPalette.parse("#80CC0000"));
+            titleColor = attrSet.getAttr(ATTRIBUTE_TITLE_COLOR).isPresent() ? attrSet.getAttr(ATTRIBUTE_TITLE_COLOR).get().getColorValue() : new Color(RgbPalette.parse("#80000000"));
+            pointColor = attrSet.getAttr(ATTRIBUTE_POINT_COLOR).isPresent() ? attrSet.getAttr(ATTRIBUTE_POINT_COLOR).get().getColorValue() : new Color(RgbPalette.parse("#80333366"));
+            borderColor = attrSet.getAttr(ATTRIBUTE_BORDER_COLOR).isPresent() ? attrSet.getAttr(ATTRIBUTE_BORDER_COLOR).get().getColorValue() : new Color(RgbPalette.parse("#80333366"));
+            radiusColor = attrSet.getAttr(ATTRIBUTE_RADIUS_COLOR).isPresent() ? attrSet.getAttr(ATTRIBUTE_RADIUS_COLOR).get().getColorValue() : new Color(RgbPalette.parse("#80CCCCCC"));
+            boundaryWidth = attrSet.getAttr(ATTRIBUTE_BOUNDARY_WIDTH).isPresent() ? attrSet.getAttr(ATTRIBUTE_BOUNDARY_WIDTH).get().getIntegerValue() : 5;
+            pointRadius = attrSet.getAttr(ATTRIBUTE_POINT_RADIUS).isPresent() ? attrSet.getAttr(ATTRIBUTE_POINT_RADIUS).get().getIntegerValue() : 10;
+            enabledBorder = attrSet.getAttr(ATTRIBUTE_ENABLED_BORDER).isPresent() && attrSet.getAttr(ATTRIBUTE_ENABLED_BORDER).get().getBoolValue();
+            enabledAnimation = !attrSet.getAttr(ATTRIBUTE_ENABLED_ANIMATION).isPresent() || attrSet.getAttr(ATTRIBUTE_ENABLED_ANIMATION).get().getBoolValue();
+            enabledShowPoint = !attrSet.getAttr(ATTRIBUTE_ENABLED_SHOW_POINT).isPresent() || attrSet.getAttr(ATTRIBUTE_ENABLED_SHOW_POINT).get().getBoolValue();
+            enabledPolygon = !attrSet.getAttr(ATTRIBUTE_ENABLED_POLYGON).isPresent() || attrSet.getAttr(ATTRIBUTE_ENABLED_POLYGON).get().getBoolValue();
+            enabledShade = !attrSet.getAttr(ATTRIBUTE_ENABLED_SHADE).isPresent() || attrSet.getAttr(ATTRIBUTE_ENABLED_SHADE).get().getBoolValue();
+            enabledRadius = !attrSet.getAttr(ATTRIBUTE_ENABLED_RADIUS).isPresent() || attrSet.getAttr(ATTRIBUTE_ENABLED_RADIUS).get().getBoolValue();
+            enabledText = !attrSet.getAttr(ATTRIBUTE_ENABLED_TEXT).isPresent() || attrSet.getAttr(ATTRIBUTE_ENABLED_TEXT).get().getBoolValue();
+            animDuration = attrSet.getAttr(ATTRIBUTE_ANIMATION_DURATION).isPresent() ? attrSet.getAttr(ATTRIBUTE_ANIMATION_DURATION).get().getIntegerValue() : 1000;
 
-        typedArray.recycle();
+        }
 
         titleRects = new ArrayList<>();
         for (int i = 0; i < count; i++) {
@@ -199,49 +216,43 @@ public class XRadarView extends View {
         cobwebPaint = new Paint();
         cobwebPaint.setColor(cobwebColor);
         cobwebPaint.setAntiAlias(true);
-        cobwebPaint.setStyle(Paint.Style.STROKE);
-
-        linePaint = new Paint();
-        linePaint.setColor(lineColor);
-        linePaint.setAntiAlias(true);
-        linePaint.setStyle(Paint.Style.STROKE);
+        cobwebPaint.setStyle(Paint.Style.STROKE_STYLE);
 
         dataPaint = new Paint();
         dataPaint.setColor(dataColor);
         dataPaint.setAntiAlias(true);
-        dataPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+        dataPaint.setStyle(Paint.Style.FILLANDSTROKE_STYLE);
 
         singlePaint = new Paint();
         singlePaint.setColor(singleColor);
         singlePaint.setAntiAlias(true);
-        singlePaint.setStyle(Paint.Style.FILL_AND_STROKE);
+        singlePaint.setStyle(Paint.Style.FILLANDSTROKE_STYLE);
 
         titlePaint = new TextPaint();
-        titlePaint.setTextSize(dataSize);
+        titlePaint.setTextSize(titleSize);
         titlePaint.setColor(titleColor);
         titlePaint.setAntiAlias(true);
+        titlePaint.setMultipleLine(true);
 
         layerPaint = new Paint();
         layerPaint.setAntiAlias(true);
-        layerPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+        layerPaint.setStyle(Paint.Style.FILLANDSTROKE_STYLE);
 
         pointPaint = new Paint();
-        pointPaint.setStyle(Paint.Style.FILL);
+        pointPaint.setStyle(Paint.Style.FILL_STYLE);
         pointPaint.setAntiAlias(true);
         pointPaint.setColor(pointColor);
 
         radiusPaint = new Paint();
-        radiusPaint.setStyle(Paint.Style.FILL);
+        radiusPaint.setStyle(Paint.Style.FILL_STYLE);
         radiusPaint.setAntiAlias(true);
         radiusPaint.setColor(radiusColor);
 
-
         borderPaint = new Paint();
-        borderPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+        borderPaint.setStyle(Paint.Style.FILLANDSTROKE_STYLE);
         borderPaint.setAntiAlias(true);
         borderPaint.setColor(borderColor);
         borderPaint.setStrokeWidth(boundaryWidth);
-
 
         loadAnimation(enabledAnimation);
 
@@ -251,40 +262,60 @@ public class XRadarView extends View {
         percents = new double[count];
         values = new CharSequence[count];
 
+        addDrawTask(this);
+        setLayoutRefreshedListener(new RefreshListener());
+        setTouchEventListener(this);
     }
 
     @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-        radius = Math.min(h, w) / 2 * radarPercent;
-        MAX_TEXT_WIDTH = (int) (Math.min(h, w) / 2 * (1 - radarPercent));
-        //中心坐标
-        centerX = w / 2;
-        centerY = h / 2;
-        postInvalidate();
-        super.onSizeChanged(w, h, oldw, oldh);
+    public boolean onTouchEvent(Component component, TouchEvent touchEvent) {
+        HiLog.info(LABEL_LOG, "%{public}s", "onTouchEvent called");
+        switch (touchEvent.getAction()) {
+            case TouchEvent.PRIMARY_POINT_DOWN:
+                int x = (int) touchEvent.getPointerPosition(touchEvent.getIndex()).getX();
+                int y = (int) touchEvent.getPointerPosition(touchEvent.getIndex()).getY();
+                for (int i = 0; i < titleRects.size(); i++) {
+                    Rect rect = titleRects.get(i);
+                    if (rect != null && rect.contains(x, y, x, y)) {
+                        if (onTitleClickListener != null) {
+                            onTitleClickListener.onTitleClick(XRadarView.this, i, x, y, rect);
+                            return true;
+                        }
+                    }
+                }
+                break;
+        }
+        return false;
     }
 
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        int wSpecSize = MeasureSpec.getSize(widthMeasureSpec);
-        int hSpecSize = MeasureSpec.getSize(heightMeasureSpec);
+    /**
+     * RefreshListener updates when view is relayout
+     */
+    class RefreshListener implements LayoutRefreshedListener {
+        @Override
+        public void onRefreshed(Component component) {
+            int w = component.getWidth();
+            int h = component.getHeight();
+            radius = Math.min(h, w) / 2 * radarPercent;
+            MAX_TEXT_WIDTH = (int) (Math.min(h, w) / 2 * (1 - radarPercent));
+            //The central coordinates
+            centerX = w / 2;
+            centerY = h / 2;
 
-        setMeasuredDimension(Math.min(wSpecSize, hSpecSize), Math.min(wSpecSize, hSpecSize));
-    }
+            if (regionShader == null && shaderColors != null) {
+                Point[] points = new Point[]{
+                        new Point(getLeft(), getTop()),
+                        new Point(getRight(), getBottom())
+                };
+                regionShader = new LinearShader(points, shaderPositions, shaderColors, Shader.TileMode.CLAMP_TILEMODE);
+            }
 
-    @Override
-    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        super.onLayout(changed, left, top, right, bottom);
-        if (regionShader == null && shaderColors != null) {
-            regionShader = new LinearGradient(getLeft(), getTop(), getRight(), getBottom(), shaderColors, shaderPositions, Shader.TileMode.CLAMP);
+            invalidate();
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
+    public void onDraw(Component component, Canvas canvas) {
         if (enabledShade) {
             drawLayer(canvas, startColor, endColor);
         } else {
@@ -312,6 +343,12 @@ public class XRadarView extends View {
         }
     }
 
+    /**
+     * Draw area border.
+     *
+     * @param canvas instance of Canvas
+     * @param scale  scale to calculate x and y coordinates
+     */
     private void drawBorder(Canvas canvas, float scale) {
         float curX, curY;
         float nextX, nextY;
@@ -333,6 +370,12 @@ public class XRadarView extends View {
 
     }
 
+    /**
+     * Draw percent points.
+     *
+     * @param canvas instance of Canvas
+     * @param scale  scale to calculate x and y coordinates
+     */
     private void drawPoint(Canvas canvas, float scale) {
         for (int i = 0; i < count; i++) {
             int x, y;
@@ -340,18 +383,24 @@ public class XRadarView extends View {
             y = (int) (centerY - scale * percents[i] * radius * Math.sin(angle * i + Math.PI / 2));
             canvas.drawCircle(x, y, pointRadius, pointPaint);
         }
-
-
     }
 
-    // 画圆心与顶点的连线
+    /**
+     * Draws a line between the center of the circle and the vertex
+     *
+     * @param canvas instance of Canvas
+     */
     private void drawRadius(Canvas canvas) {
         for (int i = 0; i < count; i++) {
             canvas.drawLine(centerX, centerY, (float) (centerX + Math.cos(angle * i + Math.PI / 2) * radius), (float) (centerY - Math.sin(angle * i + Math.PI / 2) * radius), radiusPaint);
         }
     }
 
-    // 画蜘蛛网
+    /**
+     * Draw cobwebs
+     *
+     * @param canvas instance of Canvas
+     */
     private void drawPolygon(Canvas canvas) {
         Path path = new Path();
         float r = radius / layerCount;
@@ -359,7 +408,7 @@ public class XRadarView extends View {
             float curR = r * i;
             path.reset();
             if (isCircle) {
-                path.addCircle(centerX, centerY, curR, Path.Direction.CW);
+                path.addCircle(centerX, centerY, curR, Path.Direction.CLOCK_WISE);
             } else {
                 for (int j = 0; j < count; j++) {
                     if (j == 0) {
@@ -374,9 +423,14 @@ public class XRadarView extends View {
         }
     }
 
-    // 画 各层的颜色
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    private void drawLayer(Canvas canvas, int startColor, int endColor) {
+    /**
+     * Draw the colors of each layer
+     *
+     * @param canvas     instance of Canvas
+     * @param startColor start color
+     * @param endColor   end color
+     */
+    private void drawLayer(Canvas canvas, Color startColor, Color endColor) {
         Path path = null;
         Path prePath = null;
         float r = radius / layerCount;
@@ -385,7 +439,7 @@ public class XRadarView extends View {
             path = new Path();
             for (int j = 0; j < count; j++) {
                 if (isCircle) {
-                    path.addCircle(centerX, centerY, curR, Path.Direction.CW);
+                    path.addCircle(centerX, centerY, curR, Path.Direction.CLOCK_WISE);
                 } else {
                     if (j == 0) {
                         path.moveTo(centerX, centerY - curR);
@@ -397,38 +451,43 @@ public class XRadarView extends View {
 
             if (prePath != null) {
                 if (i != 0) {
-                    prePath.op(path, Path.Op.DIFFERENCE);
+                    //    prePath.op(path, Path.Op.DIFFERENCE);
                     prePath.close();
-                    // 计算渐变颜色
-                    int a0 = Color.alpha(startColor);
-                    int r0 = Color.red(startColor);
-                    int g0 = Color.green(startColor);
-                    int b0 = Color.blue(startColor);
+                    // Calculate the gradient color
+                    int a0 = Color.alpha(startColor.getValue());
+                    int r0 = (startColor.getValue() >> 16) & 0xFF;
+                    int g0 = (startColor.getValue() >> 8) & 0xFF;
+                    int b0 = startColor.getValue() & 0xFF;
 
-                    int a1 = Color.alpha(endColor);
-                    int r1 = Color.red(endColor);
-                    int g1 = Color.green(endColor);
-                    int b1 = Color.blue(endColor);
+                    int a1 = Color.alpha(endColor.getValue());
+                    int r1 = (endColor.getValue() >> 16) & 0xFF;
+                    int g1 = (endColor.getValue() >> 8) & 0xFF;
+                    int b1 = endColor.getValue() & 0xFF;
 
                     int a2 = (int) (1.0 * i * (a1 - a0) / layerCount + a0);
                     int r2 = (int) (1.0 * i * (r1 - r0) / layerCount + r0);
                     int g2 = (int) (1.0 * i * (g1 - g0) / layerCount + g0);
                     int b2 = (int) (1.0 * i * (b1 - b0) / layerCount + b0);
 
-                    layerPaint.setColor(Color.argb(a2, r2, g2, b2));
-                    canvas.drawPath(prePath, layerPaint);
+                    layerPaint.setColor(new Color(Color.argb(a2, r2, g2, b2)));
                 } else {
                     prePath.close();
                     layerPaint.setColor(startColor);
-                    canvas.drawPath(prePath, layerPaint);
                 }
+                canvas.drawPath(prePath, layerPaint);
             }
             prePath = path;
 
         }
     }
 
-    // 画 文字和图标
+    /**
+     * Draw text and icons.
+     * <B>Note:</B> Currently Rich text functionality not implemented because of SpannableString class not available in OHOS.
+     * And also dataSize attribute is also connected with this implementation. So for better understand please refer android library.
+     *
+     * @param canvas instance of Canvas
+     */
     private void drawText(Canvas canvas) {
         Paint.FontMetrics fontMetrics = titlePaint.getFontMetrics();
         for (int i = 0; i < count; i++) {
@@ -437,19 +496,13 @@ public class XRadarView extends View {
             x = (float) (centerX + (radius) * Math.cos(angle * i + Math.PI / 2));
             y = (float) (centerY - (radius) * Math.sin(angle * i + Math.PI / 2));
             curAngle = (float) (angle * i + Math.PI / 2);
-            // 取余 在0-2PI范围内
+            // The rest is in the range of 0-2PI
             curAngle = (float) (curAngle % (2 * Math.PI));
-            SpannableString ss;
-            if (titles[i] instanceof SpannableString) {
-                ss = (SpannableString) titles[i];
+            CharSequence ss;
+            if (values == null || values[i] == null) {
+                ss = titles[i];
             } else {
-                if (values == null || values[i] == null) {
-                    ss = new SpannableString(titles[i]);
-                } else {
-                    ss = new SpannableString(titles[i] + "\n" + values[i]);
-                }
-                ss.setSpan(new AbsoluteSizeSpan(titleSize), 0, titles[i].length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                ss.setSpan(new ForegroundColorSpan(Color.RED), titles[i].length(), ss.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                ss = titles[i] + "\n" + values[i];
             }
             if (drawables == null) {
                 drawables = new int[count];
@@ -474,57 +527,74 @@ public class XRadarView extends View {
         }
     }
 
-    public Bitmap getResizeBitmap(int drawable) {
-        Bitmap bitmap = BitmapFactory.decodeResource(this.getResources(), drawable);
-        if (bitmap == null) {
+    /**
+     * Resize pixelmap into required size.
+     *
+     * @param mediaId media resource id.
+     * @return resized pixelmap.
+     */
+    private PixelMap getResizePixelmap(int mediaId) {
+        Optional<PixelMap> optional = Utils.getPixelMap(getContext(), mediaId);
+        PixelMap pixelMap = optional.isPresent() ? optional.get() : null;
+        if (pixelMap == null) {
             return null;
         }
-        int width = bitmap.getWidth();
-        int height = bitmap.getHeight();
+        int width = pixelMap.getImageInfo().size.width;
+        int height = pixelMap.getImageInfo().size.height;
         if (width <= 0 || height <= 0) {
             return null;
         }
-        // 设置想要的大小
+
+        // Set the size you want
         int newWidth = drawableSize;
         int newHeight = drawableSize;
-        // 计算缩放比例
+
+        // Calculate the scale
         float scaleWidth = ((float) newWidth) / width;
         float scaleHeight = ((float) newHeight) / height;
-        // 取得想要缩放的matrix参数
+
+        // Gets the matrix parameter that you want to scale
         Matrix matrix = new Matrix();
         matrix.postScale(scaleWidth, scaleHeight);
-        // 得到新的图片
-        Bitmap newBm = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix,
-                true);
-        bitmap.recycle();
+
+        // Get new pictures
+        PixelMap.InitializationOptions initializationOptions = new PixelMap.InitializationOptions();
+        initializationOptions.size = new Size(newWidth, newHeight);
+
+        PixelMap newBm = PixelMap.create(pixelMap, initializationOptions);
+        pixelMap.release();
         return newBm;
     }
 
-    // 用一种颜色画区域
+    /**
+     * Draw an area in one color
+     *
+     * @param canvas instance of Canvas
+     * @param scale  scale to calculate x and y coordinates
+     */
     private void drawRegion(Canvas canvas, float scale) {
         canvas.save();
         singlePaint.setColor(singleColor);
         if (enabledRegionShader) {
-            singlePaint.setShader(regionShader);
+            singlePaint.setShader(regionShader, Paint.ShaderType.LINEAR_SHADER);
         } else {
-            singlePaint.setShader(null);
+            singlePaint.setShader(null, Paint.ShaderType.LINEAR_SHADER);
         }
         List<Point> list = new ArrayList<>();
         for (int i = 0; i < count; i++) {
             int x, y;
             x = (int) (centerX + scale * percents[i] * radius * Math.cos(angle * i + Math.PI / 2));
             y = (int) (centerY - scale * percents[i] * radius * Math.sin(angle * i + Math.PI / 2));
-            Point p = new Point();
-            p.set(x, y);
+            Point p = new Point(x, y);
             list.add(p);
         }
 
         Path path = new Path();
         for (int i = 0; i < list.size(); i++) {
             if (i == 0) {
-                path.moveTo(list.get(i).x, list.get(i).y);
+                path.moveTo(list.get(i).getPointX(), list.get(i).getPointY());
             } else {
-                path.lineTo(list.get(i).x, list.get(i).y);
+                path.lineTo(list.get(i).getPointX(), list.get(i).getPointY());
             }
         }
         path.close();
@@ -532,7 +602,12 @@ public class XRadarView extends View {
         canvas.restore();
     }
 
-    // 多种颜色画区域
+    /**
+     * Draw areas in a variety of colors
+     *
+     * @param canvas instance of Canvas
+     * @param scale  scale to calculate x and y coordinates
+     */
     private void drawRegionWithColor(Canvas canvas, float scale) {
         canvas.save();
         int colorSize = colors.length;
@@ -541,8 +616,7 @@ public class XRadarView extends View {
             int x, y;
             x = (int) (centerX + scale * percents[i] * radius * Math.cos(angle * i + Math.PI / 2));
             y = (int) (centerY - scale * percents[i] * radius * Math.sin(angle * i + Math.PI / 2));
-            Point p = new Point();
-            p.set(x, y);
+            Point p = new Point(x, y);
             list.add(p);
         }
 
@@ -550,29 +624,39 @@ public class XRadarView extends View {
         for (int i = 0; i < list.size() - 1; i++) {
             path.reset();
             path.moveTo(centerX, centerY);
-            path.lineTo(list.get(i).x, list.get(i).y);
-            path.lineTo(list.get(i + 1).x, list.get(i + 1).y);
+            path.lineTo(list.get(i).getPointX(), list.get(i).getPointY());
+            path.lineTo(list.get(i + 1).getPointX(), list.get(i + 1).getPointY());
             path.lineTo(centerX, centerY);
             path.close();
-            dataPaint.setColor(colors[i % colorSize]);
+            dataPaint.setColor(new Color(colors[i % colorSize]));
             canvas.drawPath(path, dataPaint);
         }
         path.reset();
         path.moveTo(centerX, centerY);
-        path.lineTo(list.get(list.size() - 1).x, list.get(list.size() - 1).y);
-        path.lineTo(list.get(0).x, list.get(0).y);
+        path.lineTo(list.get(list.size() - 1).getPointX(), list.get(list.size() - 1).getPointY());
+        path.lineTo(list.get(0).getPointX(), list.get(0).getPointY());
         path.lineTo(centerX, centerY);
         path.close();
-        dataPaint.setColor(colors[(list.size() - 1) % colorSize]);
+        dataPaint.setColor(new Color(colors[(list.size() - 1) % colorSize]));
         canvas.drawPath(path, dataPaint);
         canvas.restore();
     }
 
-    // 画 多行文字
-    public void drawMultiLinesTextAndIcon(Canvas canvas, float x, float y, CharSequence text, int drawable, int verticalValue, int position) {
+    /**
+     * Draw multiple lines of text
+     *
+     * @param canvas        instance of Canvas
+     * @param x             x coordinate
+     * @param y             y coordinate
+     * @param text          instance of CharSequence to draw text
+     * @param drawable      icon drawable
+     * @param verticalValue vertical value
+     * @param position      position
+     */
+    private void drawMultiLinesTextAndIcon(Canvas canvas, float x, float y, CharSequence text, int drawable, int verticalValue, int position) {
         int drawableAvaiable = 1;
         try {
-            this.getContext().getResources().openRawResource(drawable);
+            this.getContext().getResourceManager().getResource(drawable);
             drawableAvaiable = 1;
         } catch (Exception e) {
             drawableAvaiable = 0;
@@ -585,7 +669,9 @@ public class XRadarView extends View {
                 allowWidth = allowWidth - drawableSize * drawableAvaiable - drawablePadding;
             }
         }
-        StaticLayout layout = new StaticLayout(text, titlePaint, allowWidth, Layout.Alignment.ALIGN_CENTER, 1.0F, 0.0F, true);
+
+        titlePaint.setTextSize(titleSize);
+        SimpleTextLayout layout = new SimpleTextLayout(text.toString(), titlePaint, new Rect(), allowWidth, true);
         canvas.save();
         if (verticalValue == 1) {
             canvas.translate(x, y - layout.getHeight() - descPadding);
@@ -598,68 +684,47 @@ public class XRadarView extends View {
             rect = new Rect((int) x, (int) (y - layout.getHeight() / 2), (int) x + rectWidth, (int) (y - layout.getHeight() / 2) + layout.getHeight());
         }
         titleRects.set(position, rect);
-        layout.draw(canvas);
-        canvas.restore();//别忘了restore
+        layout.drawText(canvas);
+        canvas.restore();//Don't forget restore
 
-        // 绘制图标
+        // Draw the icon
         if (drawableSize * drawableAvaiable != 0) {
-            Bitmap bitmap = getResizeBitmap(drawable);
-            if (bitmap != null) {
+            PixelMap pixelmap = getResizePixelmap(drawable);
+            PixelMapHolder pixelMapHolder = new PixelMapHolder(pixelmap);
+            if (pixelmap != null) {
                 if (verticalValue == 1) {
-                    canvas.drawBitmap(bitmap, x + layout.getWidth(), y - drawableSize * drawableAvaiable / 2 - layout.getHeight() / 2 - descPadding, titlePaint);
+                    canvas.drawPixelMapHolder(pixelMapHolder, x + layout.getWidth(), y - drawableSize * drawableAvaiable / 2 - layout.getHeight() / 2 - descPadding, titlePaint);
                 } else if (verticalValue == -1) {
-                    canvas.drawBitmap(bitmap, x + layout.getWidth(), y + descPadding + layout.getHeight() / 2 - drawableSize * drawableAvaiable / 2, titlePaint);
+                    canvas.drawPixelMapHolder(pixelMapHolder, x + layout.getWidth(), y + descPadding + layout.getHeight() / 2 - drawableSize * drawableAvaiable / 2, titlePaint);
                 } else {
-                    canvas.drawBitmap(bitmap, x + layout.getWidth(), y - drawableSize * drawableAvaiable / 2, titlePaint);
+                    canvas.drawPixelMapHolder(pixelMapHolder, x + layout.getWidth(), y - drawableSize * drawableAvaiable / 2, titlePaint);
                 }
-                bitmap.recycle();
+                pixelmap.release();
             }
         }
 
     }
 
+    /**
+     * Load animation and update current scale value.
+     *
+     * @param enabled Boolean value to identify animation is enabled or not.
+     */
     public void loadAnimation(boolean enabled) {
         if (!enabled) {
             currentScale = 1;
             invalidate();
         } else {
-            ValueAnimator valueAnimator = ValueAnimator.ofFloat(0.3f, 1.0f);
-            valueAnimator.setInterpolator(new LinearInterpolator());
+            AnimatorValue valueAnimator = new AnimatorValue();
+            valueAnimator.setCurveType(Animator.CurveType.ACCELERATE);
             valueAnimator.setDuration(animDuration);
-            valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator animation) {
-                    currentScale = (float) animation.getAnimatedValue();
-                    invalidate();
-                }
+            valueAnimator.setValueUpdateListener((animatorValue, v) -> {
+                currentScale = v;
+                invalidate();
             });
             valueAnimator.start();
         }
     }
-
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                int x = (int) event.getX();
-                int y = (int) event.getY();
-                for (int i = 0; i < titleRects.size(); i++) {
-                    Rect rect = titleRects.get(i);
-                    if (rect != null && rect.contains(x, y)) {
-                        if (onTitleClickListener != null) {
-                            onTitleClickListener.onTitleClick(XRadarView.this, i, x, y, rect);
-                            return true;
-                        }
-                    }
-                }
-                break;
-        }
-        return super.onTouchEvent(event);
-    }
-
-
-    OnTitleClickListener onTitleClickListener;
 
     public void setOnTitleClickListener(OnTitleClickListener onTitleClickListener) {
         this.onTitleClickListener = onTitleClickListener;
@@ -669,320 +734,651 @@ public class XRadarView extends View {
         void onTitleClick(XRadarView view, int position, int touchX, int touchY, Rect titleRect);
     }
 
+    /**
+     * Set icons array to drawables variable.
+     *
+     * @param drawables int array of resource ids.
+     */
     public void setDrawables(int[] drawables) {
         this.drawables = drawables;
         invalidate();
     }
 
+    /**
+     * Set percent values array.
+     *
+     * @param percents double array of percent values.
+     */
     public void setPercents(double[] percents) {
         this.percents = percents;
         invalidate();
     }
 
+    /**
+     * Set titles array.
+     *
+     * @param titles CharSequence array of titles.
+     */
     public void setTitles(CharSequence[] titles) {
         this.titles = titles;
         invalidate();
     }
 
+    /**
+     * Set percent values array in CharSequence form.
+     *
+     * @param values CharSequence array of percent values.
+     */
     public void setValues(CharSequence[] values) {
         this.values = values;
         invalidate();
     }
 
+    /**
+     * Get colors array of multi-color region.
+     *
+     * @return int array of colors.
+     */
+    public int[] getColors() {
+        return colors;
+    }
+
+    /**
+     * Set colors array for multi-color region.
+     *
+     * @param colors int array of colors value.
+     */
     public void setColors(int[] colors) {
         this.colors = colors;
         invalidate();
     }
 
+    /**
+     * Get count (count of edges in polygon).
+     *
+     * @return count in int form.
+     */
     public int getCount() {
         return count;
     }
 
+    /**
+     * Set count
+     *
+     * @param count Edges in polygon.
+     */
     public void setCount(int count) {
         this.count = count;
         angle = (float) (Math.PI * 2 / count);
         invalidate();
     }
 
+    /**
+     * Get layer count.
+     *
+     * @return layer count in int form.
+     */
     public int getLayerCount() {
         return layerCount;
     }
 
+    /**
+     * Set layer count.
+     *
+     * @param layerCount The layer count.
+     */
     public void setLayerCount(int layerCount) {
         this.layerCount = layerCount;
         invalidate();
     }
 
+    /**
+     * Get drawable(icon) size.
+     *
+     * @return Drawable(icon) size in int form.
+     */
     public int getDrawableSize() {
         return drawableSize;
     }
 
+    /**
+     * Set drawable(icon) size.
+     *
+     * @param drawableSize The drawable(icon) size.
+     */
     public void setDrawableSize(int drawableSize) {
         this.drawableSize = drawableSize;
         invalidate();
     }
 
+    /**
+     * Get drawable(icon) padding.
+     *
+     * @return Drawable(icon) padding in int form.
+     */
     public int getDrawablePadding() {
         return drawablePadding;
     }
 
+    /**
+     * Set drawable(icon) padding.
+     *
+     * @param drawablePadding Drawable(icon) padding.
+     */
     public void setDrawablePadding(int drawablePadding) {
         this.drawablePadding = drawablePadding;
         invalidate();
     }
 
+    /**
+     * Get desc padding.
+     *
+     * @return Desc padding in int form.
+     */
     public int getDescPadding() {
         return descPadding;
     }
 
+    /**
+     * Set desc padding.
+     *
+     * @param descPadding Desc padding.
+     */
     public void setDescPadding(int descPadding) {
         this.descPadding = descPadding;
         invalidate();
     }
 
+    /**
+     * Get title size.
+     *
+     * @return Title size in int form.
+     */
     public int getTitleSize() {
         return titleSize;
     }
 
+    /**
+     * Set title size.
+     *
+     * @param titleSize The title size.
+     */
     public void setTitleSize(int titleSize) {
         this.titleSize = titleSize;
         invalidate();
     }
 
+    /**
+     * Get Data(Percent value) text size.
+     *
+     * @return Data(Percent value) text size in int form.
+     */
     public int getDataSize() {
         return dataSize;
     }
 
+    /**
+     * Set Data(Percent value) text size.
+     *
+     * @param dataSize Data(Percent value) text size.
+     */
     public void setDataSize(int dataSize) {
         this.dataSize = dataSize;
         invalidate();
     }
 
+    /**
+     * Get radar percent.
+     *
+     * @return Radar percent in float form.
+     */
     public float getRadarPercent() {
         return radarPercent;
     }
 
+    /**
+     * Set radar percent.
+     *
+     * @param radarPercent The radar percent.
+     */
     public void setRadarPercent(float radarPercent) {
         this.radarPercent = radarPercent;
         invalidate();
     }
 
-    public int getStartColor() {
+    /**
+     * Get start color of gradient ring.
+     *
+     * @return Start color in Color instance form.
+     */
+    public Color getStartColor() {
         return startColor;
     }
 
-    public void setStartColor(int startColor) {
+    /**
+     * Set start color of gradient ring.
+     *
+     * @param startColor The start color.
+     */
+    public void setStartColor(Color startColor) {
         this.startColor = startColor;
         invalidate();
     }
 
-    public int getEndColor() {
+    /**
+     * Get end color of gradient ring.
+     *
+     * @return End color in Color instance form.
+     */
+    public Color getEndColor() {
         return endColor;
     }
 
-    public void setEndColor(int endColor) {
+    /**
+     * Set end color of gradient ring.
+     *
+     * @param endColor The end color.
+     */
+    public void setEndColor(Color endColor) {
         this.endColor = endColor;
         invalidate();
     }
 
+    /**
+     * Return the status of animation (Enabled or Disabled)
+     *
+     * @return true if the status of animation is enabled.
+     */
     public boolean isEnabledAnimation() {
         return enabledAnimation;
     }
 
+    /**
+     * Sets whether animation is enable or not.
+     * It will reset the animation if the status has changed.
+     *
+     * @param enabledAnimation true if enable
+     */
     public void setEnabledAnimation(boolean enabledAnimation) {
         this.enabledAnimation = enabledAnimation;
         invalidate();
     }
 
+    /**
+     * Return the status of showPoint (Enabled or Disabled)
+     *
+     * @return true if the status of showPoint is enabled.
+     */
     public boolean isEnabledShowPoint() {
         return enabledShowPoint;
     }
 
+    /**
+     * Sets whether showPoint is enable or not.
+     * It will reset the view if the status has changed.
+     *
+     * @param enabledShowPoint true if enable
+     */
     public void setEnabledShowPoint(boolean enabledShowPoint) {
         this.enabledShowPoint = enabledShowPoint;
         invalidate();
     }
 
-    public int getCobwebColor() {
+    /**
+     * Get the cobweb color.
+     *
+     * @return Cobweb color in Color instance form.
+     */
+    public Color getCobwebColor() {
         return cobwebColor;
     }
 
-    public void setCobwebColor(int cobwebColor) {
+    /**
+     * Set the cobweb color.
+     *
+     * @param cobwebColor The cobweb color.
+     */
+    public void setCobwebColor(Color cobwebColor) {
         this.cobwebColor = cobwebColor;
         cobwebPaint.setColor(cobwebColor);
         invalidate();
     }
 
-    public int getLineColor() {
-        return lineColor;
-    }
-
-    public void setLineColor(int lineColor) {
-        this.lineColor = lineColor;
-        linePaint.setColor(lineColor);
-        invalidate();
-    }
-
-    public int getDataColor() {
+    /**
+     * Get the Data(percent value) text color.
+     *
+     * @return Data(percent value) color in Color instance form.
+     */
+    public Color getDataColor() {
         return dataColor;
     }
 
-    public void setDataColor(int dataColor) {
+    /**
+     * Set the Data(percent value) text color.
+     *
+     * @param dataColor The Data(percent value) text color.
+     */
+    public void setDataColor(Color dataColor) {
         this.dataColor = dataColor;
         dataPaint.setColor(dataColor);
         invalidate();
     }
 
-    public int getTitleColor() {
+    /**
+     * Get the title color.
+     *
+     * @return Title color in Color instance form.
+     */
+    public Color getTitleColor() {
         return titleColor;
     }
 
-    public void setTitleColor(int titleColor) {
+    /**
+     * Set the title color.
+     *
+     * @param titleColor The title color.
+     */
+    public void setTitleColor(Color titleColor) {
         this.titleColor = titleColor;
         titlePaint.setColor(titleColor);
         invalidate();
     }
 
-    public int getPointColor() {
+    /**
+     * Get the point color.
+     *
+     * @return Point color in Color instance form.
+     */
+    public Color getPointColor() {
         return pointColor;
     }
 
-    public void setPointColor(int pointColor) {
+    /**
+     * Set the point color.
+     *
+     * @param pointColor The point color.
+     */
+    public void setPointColor(Color pointColor) {
         this.pointColor = pointColor;
         pointPaint.setColor(pointColor);
         invalidate();
     }
 
+    /**
+     * Get the point radius.
+     *
+     * @return Point radius in int form.
+     */
     public int getPointRadius() {
         return pointRadius;
     }
 
+    /**
+     * Set the point radius.
+     *
+     * @param pointRadius The point radius.
+     */
     public void setPointRadius(int pointRadius) {
         this.pointRadius = pointRadius;
         invalidate();
     }
 
+    /**
+     * Return the status of area border (Enabled or Disabled)
+     *
+     * @return true if the status of area border is enabled.
+     */
     public boolean isEnabledBorder() {
         return enabledBorder;
     }
 
+    /**
+     * Sets whether area border is enable or not.
+     * It will reset the view if the status has changed.
+     *
+     * @param enabledBorder true if border enable.
+     */
     public void setEnabledBorder(boolean enabledBorder) {
         this.enabledBorder = enabledBorder;
         invalidate();
     }
 
-    public int getBorderColor() {
+    /**
+     * Get the border color.
+     *
+     * @return Border color in Color instance form.
+     */
+    public Color getBorderColor() {
         return borderColor;
     }
 
-    public void setBorderColor(int borderColor) {
+    /**
+     * Set the border color.
+     *
+     * @param borderColor The border color.
+     */
+    public void setBorderColor(Color borderColor) {
         this.borderColor = borderColor;
         borderPaint.setColor(borderColor);
         invalidate();
     }
 
+    /**
+     * Get the boundary width.
+     *
+     * @return Boundary width in int form.
+     */
     public int getBoundaryWidth() {
         return boundaryWidth;
     }
 
+    /**
+     * Set the boundary width.
+     *
+     * @param boundaryWidth The boundary width.
+     */
     public void setBoundaryWidth(int boundaryWidth) {
         this.boundaryWidth = boundaryWidth;
     }
 
+    /**
+     * Return the status of draw polygon (Enabled or Disabled)
+     *
+     * @return true if the status of polygon is enabled.
+     */
     public boolean isEnabledPolygon() {
         return enabledPolygon;
     }
 
+    /**
+     * Sets whether polygon is draw on view or not.
+     * It will reset the view if the status has changed.
+     *
+     * @param enabledPolygon true if polygon enable.
+     */
     public void setEnabledPolygon(boolean enabledPolygon) {
         this.enabledPolygon = enabledPolygon;
         invalidate();
     }
 
-    public int[] getColors() {
-        return colors;
-    }
-
+    /**
+     * Return the status of area outline (Circular or not)
+     *
+     * @return true if the status of area outline is circular.
+     */
     public boolean isCircle() {
         return isCircle;
     }
 
+    /**
+     * Sets whether area outline is circular or not.
+     * It will reset the view if the status has changed.
+     *
+     * @param circle true if area outline is circular.
+     */
     public void setCircle(boolean circle) {
         isCircle = circle;
         invalidate();
     }
 
+    /**
+     * Return the status of shade (enabled or disabled)
+     *
+     * @return true if the status of shade is enabled.
+     */
     public boolean isEnabledShade() {
         return enabledShade;
     }
 
+    /**
+     * Sets whether shade is enable or not.
+     * It will reset the view if the status has changed.
+     *
+     * @param enabledShade true if shade is enable.
+     */
     public void setEnabledShade(boolean enabledShade) {
         this.enabledShade = enabledShade;
         invalidate();
     }
 
+    /**
+     * Return the status of radius (enabled or disabled)
+     *
+     * @return true if the status of radius is enabled.
+     */
     public boolean isEnabledRadius() {
         return enabledRadius;
     }
 
+    /**
+     * Sets whether radius is enable or not.
+     * It will reset the view if the status has changed.
+     *
+     * @param enabledRadius true if radius is enable.
+     */
     public void setEnabledRadius(boolean enabledRadius) {
         this.enabledRadius = enabledRadius;
         invalidate();
     }
 
+    /**
+     * Return the status of title (enabled or disabled)
+     *
+     * @return true if the status of title is enabled.
+     */
     public boolean isEnabledText() {
         return enabledText;
     }
 
+    /**
+     * Sets whether title is enable or not.
+     * It will reset the view if the status has changed.
+     *
+     * @param enabledText true if title is enable.
+     */
     public void setEnabledText(boolean enabledText) {
         this.enabledText = enabledText;
         invalidate();
     }
 
-    public int getSingleColor() {
+    /**
+     * Get the single color of area region.
+     *
+     * @return Single color in Color instance form.
+     */
+    public Color getSingleColor() {
         return singleColor;
     }
 
-    public void setSingleColor(int singleColor) {
+    /**
+     * Set the single color.
+     *
+     * @param singleColor The color of area region when multi-color mode is disable.
+     */
+    public void setSingleColor(Color singleColor) {
         this.singleColor = singleColor;
         singlePaint.setColor(singleColor);
         invalidate();
     }
 
-    public void setRegionShaderConfig(int colors[], float positions[]) {
-        this.shaderColors = colors;
-        this.shaderPositions = positions;
-        requestLayout();
-        invalidate();
+    /**
+     * Return the status of region shader (enabled or disabled)
+     *
+     * @return true if the status of region shader is enabled.
+     */
+    public boolean isEnabledRegionShader() {
+        return this.enabledRegionShader;
     }
 
+    /**
+     * Sets whether region shader is enable or not.
+     * It will reset the view if the status has changed.
+     *
+     * @param enabled true if region shader is enable.
+     */
     public void setEnabledRegionShader(boolean enabled) {
         this.enabledRegionShader = enabled;
-        requestLayout();
+        postLayout();
         invalidate();
     }
 
+    /**
+     * Get the region shader color array.
+     *
+     * @return Region shader color array
+     */
+    public Color[] getShaderColors() {
+        return shaderColors;
+    }
+
+    /**
+     * Get the shader positions array.
+     *
+     * @return Shader positions float array.
+     */
+    public float[] getShaderPositions() {
+        return shaderPositions;
+    }
+
+    /**
+     * Set colors and positions for region shader.
+     *
+     * @param colors    colors array.
+     * @param positions positions float array.
+     */
+    public void setRegionShaderConfig(Color[] colors, float[] positions) {
+        this.shaderColors = colors;
+        this.shaderPositions = positions;
+        postLayout();
+        invalidate();
+    }
+
+    /**
+     * Get path rect.
+     *
+     * @return instance of RectF.
+     */
     public RectF getPathRect() {
         List<Point> list = new ArrayList<>();
         for (int i = 0; i < count; i++) {
             int x, y;
             x = (int) (centerX + percents[i] * radius * Math.cos(angle * i + Math.PI / 2));
             y = (int) (centerY - percents[i] * radius * Math.sin(angle * i + Math.PI / 2));
-            Point p = new Point();
-            p.set(x, y);
+            Point p = new Point(x, y);
             list.add(p);
         }
 
         Path path = new Path();
         for (int i = 0; i < list.size(); i++) {
             if (i == 0) {
-                path.moveTo(list.get(i).x, list.get(i).y);
+                path.moveTo(list.get(i).getPointX(), list.get(i).getPointY());
             } else {
-                path.lineTo(list.get(i).x, list.get(i).y);
+                path.lineTo(list.get(i).getPointX(), list.get(i).getPointY());
             }
         }
         path.close();
         RectF rect = new RectF();
-        path.computeBounds(rect, true);
+        path.computeBounds(rect);
         return rect;
     }
 }

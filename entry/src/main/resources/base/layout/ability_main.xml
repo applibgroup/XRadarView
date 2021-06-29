@@ -1,0 +1,478 @@
+<?xml version="1.0" encoding="utf-8"?>
+<DirectionalLayout
+    xmlns:ohos="http://schemas.huawei.com/res/ohos"
+    ohos:height="match_parent"
+    ohos:width="match_parent"
+    ohos:orientation="vertical">
+
+    <com.orzangleli.radar.XRadarView
+        ohos:id="$+id:radarView"
+        ohos:width="match_parent"
+        ohos:height="360vp"
+        ohos:count="7"
+        ohos:enabledBorder="true"
+        ohos:enabledAnimation="true"/>
+
+    <Text
+        ohos:width="match_parent"
+        ohos:height="40vp"
+        ohos:background_element="#00cccc"
+        ohos:text_alignment="left|vertical_center"
+        ohos:left_padding="20vp"
+        ohos:text_size="20fp"
+        ohos:text="Configuration  options" />
+
+    <ScrollView
+        ohos:width="match_parent"
+        ohos:height="match_parent"
+        ohos:padding="8vp">
+
+        <DirectionalLayout
+            ohos:width="match_parent"
+            ohos:height="match_content"
+            ohos:orientation="vertical">
+
+            <Text
+                ohos:id="$+id:countTextView"
+                ohos:width="match_parent"
+                ohos:height="match_content"
+                ohos:top_margin="10vp"
+                ohos:text_alignment="left|vertical_center"
+                ohos:left_padding="20vp"
+                ohos:text_size="14fp"
+                ohos:text="positive hexagon" />
+
+            <DirectionalLayout
+                ohos:width="match_parent"
+                ohos:height="match_content"
+                ohos:orientation="horizontal">
+
+                <Text
+                    ohos:width="match_content"
+                    ohos:height="match_parent"
+                    ohos:text_size="14fp"
+                    ohos:text_alignment="vertical_center"
+                    ohos:text="3" />
+
+                <Slider
+                    ohos:id="$+id:seekBar"
+                    ohos:width="0vp"
+                    ohos:height="40vp"
+                    ohos:weight="1"
+                    ohos:max="4"
+                    ohos:progress="4" />
+
+                <Text
+                    ohos:width="match_content"
+                    ohos:height="match_parent"
+                    ohos:text_size="14fp"
+                    ohos:text_alignment="vertical_center"
+                    ohos:text="7" />
+
+            </DirectionalLayout>
+
+            <Text
+                ohos:id="$+id:layerCountTextView"
+                ohos:width="match_parent"
+                ohos:height="match_content"
+                ohos:top_margin="10vp"
+                ohos:text_size="14fp"
+                ohos:text_alignment="left|vertical_center"
+                ohos:left_padding="20vp"
+                ohos:text="layer number 5" />
+
+            <DirectionalLayout
+                ohos:width="match_parent"
+                ohos:height="match_content"
+                ohos:orientation="horizontal">
+
+                <Text
+                    ohos:width="match_content"
+                    ohos:height="match_parent"
+                    ohos:text_size="14fp"
+                    ohos:text_alignment="vertical_center"
+                    ohos:text="0" />
+
+                <Slider
+                    ohos:id="$+id:seekBar2"
+                    ohos:width="0vp"
+                    ohos:height="40vp"
+                    ohos:weight="1"
+                    ohos:max="10"
+                    ohos:progress="5" />
+
+                <Text
+                    ohos:width="match_content"
+                    ohos:height="match_parent"
+                    ohos:text_size="14fp"
+                    ohos:text_alignment="vertical_center"
+                    ohos:text="10" />
+
+            </DirectionalLayout>
+
+            <Text
+                ohos:width="match_parent"
+                ohos:height="match_content"
+                ohos:top_margin="10vp"
+                ohos:text_size="14fp"
+                ohos:text_alignment="left|vertical_center"
+                ohos:left_padding="20vp"
+                ohos:text="Icon  size" />
+
+            <DirectionalLayout
+                ohos:width="match_parent"
+                ohos:height="match_content"
+                ohos:orientation="horizontal">
+
+                <Text
+                    ohos:width="match_content"
+                    ohos:height="match_parent"
+                    ohos:text_size="14fp"
+                    ohos:text_alignment="vertical_center"
+                    ohos:text="20" />
+
+                <Slider
+                    ohos:id="$+id:seekBar3"
+                    ohos:width="0vp"
+                    ohos:height="40vp"
+                    ohos:weight="1"
+                    ohos:max="20"
+                    ohos:progress="10" />
+
+                <Text
+                    ohos:width="match_content"
+                    ohos:height="match_parent"
+                    ohos:text_size="14fp"
+                    ohos:text_alignment="vertical_center"
+                    ohos:text="40" />
+
+            </DirectionalLayout>
+
+            <Text
+                ohos:width="match_parent"
+                ohos:height="match_content"
+                ohos:top_margin="10vp"
+                ohos:text_size="14fp"
+                ohos:text_alignment="left|vertical_center"
+                ohos:left_padding="20vp"
+                ohos:text="Title text size" />
+
+            <DirectionalLayout
+                ohos:width="match_parent"
+                ohos:height="match_content"
+                ohos:orientation="horizontal">
+
+                <Text
+                    ohos:width="match_content"
+                    ohos:height="match_parent"
+                    ohos:text_size="14fp"
+                    ohos:text_alignment="vertical_center"
+                    ohos:text="30" />
+
+                <Slider
+                    ohos:id="$+id:seekBar4"
+                    ohos:width="0vp"
+                    ohos:height="40vp"
+                    ohos:weight="1"
+                    ohos:max="20"
+                    ohos:progress="10" />
+
+                <Text
+                    ohos:width="match_content"
+                    ohos:height="match_parent"
+                    ohos:text_size="14fp"
+                    ohos:text_alignment="vertical_center"
+                    ohos:text="50" />
+
+            </DirectionalLayout>
+
+            <Text
+                ohos:width="match_parent"
+                ohos:height="match_content"
+                ohos:top_margin="10vp"
+                ohos:text_size="14fp"
+                ohos:text_alignment="left|vertical_center"
+                ohos:left_padding="20vp"
+                ohos:text="Draw Boundary Line" />
+
+            <ToggleButton
+                ohos:id="$+id:drawBorder"
+                ohos:width="match_content"
+                ohos:height="match_content"
+                ohos:layout_alignment="center"
+                ohos:left_padding="16vp"
+                ohos:right_padding="16vp"
+                ohos:top_padding="8vp"
+                ohos:bottom_padding="8vp"
+                ohos:text_size="14fp"
+                ohos:background_element="#ccc"
+                />
+
+            <Text
+                ohos:width="match_parent"
+                ohos:height="match_content"
+                ohos:top_margin="10vp"
+                ohos:text_size="14fp"
+                ohos:text_alignment="left|vertical_center"
+                ohos:left_padding="20vp"
+                ohos:text="On Animation" />
+
+            <Button
+                ohos:id="$+id:loadAnimation"
+                ohos:width="match_content"
+                ohos:height="match_content"
+                ohos:layout_alignment="center"
+                ohos:text="Load  Animation"
+                ohos:left_padding="16vp"
+                ohos:right_padding="16vp"
+                ohos:top_padding="8vp"
+                ohos:bottom_padding="8vp"
+                ohos:text_size="14fp"
+                ohos:background_element="#ccc"
+                />
+
+
+            <Text
+                ohos:width="match_parent"
+                ohos:height="match_content"
+                ohos:top_margin="10vp"
+                ohos:text_size="14fp"
+                ohos:text_alignment="left|vertical_center"
+                ohos:left_padding="20vp"
+                ohos:text="Draw dots" />
+
+            <ToggleButton
+                ohos:id="$+id:drawPoint"
+                ohos:width="match_content"
+                ohos:height="match_content"
+                ohos:layout_alignment="center"
+                ohos:left_padding="16vp"
+                ohos:right_padding="16vp"
+                ohos:top_padding="8vp"
+                ohos:bottom_padding="8vp"
+                ohos:text_size="14fp"
+                ohos:background_element="#ccc"
+                />
+
+            <Text
+                ohos:width="match_parent"
+                ohos:height="match_content"
+                ohos:top_margin="10vp"
+                ohos:text_size="14fp"
+                ohos:text_alignment="left|vertical_center"
+                ohos:left_padding="20vp"
+                ohos:text="Draw  Grid" />
+
+            <ToggleButton
+                ohos:id="$+id:drawPolygon"
+                ohos:width="match_content"
+                ohos:height="match_content"
+                ohos:layout_alignment="center"
+                ohos:left_padding="16vp"
+                ohos:right_padding="16vp"
+                ohos:top_padding="8vp"
+                ohos:bottom_padding="8vp"
+                ohos:text_size="14fp"
+                ohos:background_element="#ccc"
+                />
+
+            <Text
+                ohos:width="match_parent"
+                ohos:height="match_content"
+                ohos:top_margin="10vp"
+                ohos:text_size="14fp"
+                ohos:text_alignment="left|vertical_center"
+                ohos:left_padding="20vp"
+                ohos:text="Draw  Gradient Ring" />
+
+            <ToggleButton
+                ohos:id="$+id:drawShade"
+                ohos:width="match_content"
+                ohos:height="match_content"
+                ohos:layout_alignment="center"
+                ohos:left_padding="16vp"
+                ohos:right_padding="16vp"
+                ohos:top_padding="8vp"
+                ohos:bottom_padding="8vp"
+                ohos:text_size="14fp"
+                ohos:background_element="#ccc"
+                />
+
+            <Text
+                ohos:width="match_parent"
+                ohos:height="match_content"
+                ohos:top_margin="10vp"
+                ohos:text_size="14fp"
+                ohos:text_alignment="left|vertical_center"
+                ohos:left_padding="20vp"
+                ohos:text="Multi-color distinguished area" />
+
+            <ToggleButton
+                ohos:id="$+id:drawMultiColor"
+                ohos:width="match_content"
+                ohos:height="match_content"
+                ohos:layout_alignment="center"
+                ohos:left_padding="16vp"
+                ohos:right_padding="16vp"
+                ohos:top_padding="8vp"
+                ohos:bottom_padding="8vp"
+                ohos:text_size="14fp"
+                ohos:background_element="#ccc"
+                />
+
+            <Text
+                ohos:width="match_parent"
+                ohos:height="match_content"
+                ohos:top_margin="10vp"
+                ohos:text_size="14fp"
+                ohos:text_alignment="left|vertical_center"
+                ohos:left_padding="20vp"
+                ohos:text="Area Color  Gradient" />
+
+            <ToggleButton
+                ohos:id="$+id:regionSupportShader"
+                ohos:width="match_content"
+                ohos:height="match_content"
+                ohos:layout_alignment="center"
+                ohos:left_padding="16vp"
+                ohos:right_padding="16vp"
+                ohos:top_padding="8vp"
+                ohos:bottom_padding="8vp"
+                ohos:text_size="14fp"
+                ohos:background_element="#ccc"
+                />
+
+            <Text
+                ohos:width="match_parent"
+                ohos:height="match_content"
+                ohos:top_margin="10vp"
+                ohos:text_size="14fp"
+                ohos:text_alignment="left|vertical_center"
+                ohos:left_padding="20vp"
+                ohos:text="Is it a circular outline" />
+
+            <ToggleButton
+                ohos:id="$+id:regionCircle"
+                ohos:width="match_content"
+                ohos:height="match_content"
+                ohos:layout_alignment="center"
+                ohos:left_padding="16vp"
+                ohos:right_padding="16vp"
+                ohos:top_padding="8vp"
+                ohos:bottom_padding="8vp"
+                ohos:text_size="14fp"
+                ohos:background_element="#ccc"
+                />
+
+            <Text
+                ohos:width="match_parent"
+                ohos:height="match_content"
+                ohos:top_margin="10vp"
+                ohos:text_size="14fp"
+                ohos:text_alignment="left|vertical_center"
+                ohos:left_padding="20vp"
+                ohos:text="Draw  Radius" />
+
+            <ToggleButton
+                ohos:id="$+id:drawRadius"
+                ohos:width="match_content"
+                ohos:height="match_content"
+                ohos:layout_alignment="center"
+                ohos:left_padding="16vp"
+                ohos:right_padding="16vp"
+                ohos:top_padding="8vp"
+                ohos:bottom_padding="8vp"
+                ohos:text_size="14fp"
+                ohos:background_element="#ccc"
+                />
+
+            <Text
+                ohos:width="match_parent"
+                ohos:height="match_content"
+                ohos:top_margin="10vp"
+                ohos:text_size="14fp"
+                ohos:text_alignment="left|vertical_center"
+                ohos:left_padding="20vp"
+                ohos:text="Draw  text" />
+
+            <ToggleButton
+                ohos:id="$+id:drawText"
+                ohos:width="match_content"
+                ohos:height="match_content"
+                ohos:layout_alignment="center"
+                ohos:left_padding="16vp"
+                ohos:right_padding="16vp"
+                ohos:top_padding="8vp"
+                ohos:bottom_padding="8vp"
+                ohos:text_size="14fp"
+                ohos:background_element="#ccc"
+                />
+
+            <Text
+                ohos:width="match_parent"
+                ohos:height="match_content"
+                ohos:top_margin="10vp"
+                ohos:text_size="14fp"
+                ohos:text_alignment="left|vertical_center"
+                ohos:left_padding="20vp"
+                ohos:text="Show icons" />
+
+            <ToggleButton
+                ohos:id="$+id:drawIcon"
+                ohos:width="match_content"
+                ohos:height="match_content"
+                ohos:layout_alignment="center"
+                ohos:left_padding="16vp"
+                ohos:right_padding="16vp"
+                ohos:top_padding="8vp"
+                ohos:bottom_padding="8vp"
+                ohos:text_size="14fp"
+                ohos:background_element="#ccc"
+                />
+
+            <Text
+                ohos:width="match_parent"
+                ohos:height="match_content"
+                ohos:top_margin="10vp"
+                ohos:text_size="14fp"
+                ohos:text_alignment="left|vertical_center"
+                ohos:left_padding="20vp"
+                ohos:text="Rich text title" />
+
+            <ToggleButton
+                ohos:id="$+id:drawRichText"
+                ohos:width="match_content"
+                ohos:height="match_content"
+                ohos:layout_alignment="center"
+                ohos:left_padding="16vp"
+                ohos:right_padding="16vp"
+                ohos:top_padding="8vp"
+                ohos:bottom_padding="8vp"
+                ohos:text_size="14fp"
+                ohos:background_element="#ccc"
+                />
+
+            <Text
+                ohos:width="match_parent"
+                ohos:height="40vp"
+                ohos:top_margin="20vp"
+                ohos:text_size="14fp"
+                ohos:background_element="#cccccc"
+                ohos:text_alignment="center"
+                ohos:text="Click on the title in the radar map to try ." />
+
+            <Text
+                ohos:id="$+id:jump"
+                ohos:width="match_parent"
+                ohos:height="40vp"
+                ohos:top_margin="20vp"
+                ohos:text_size="14fp"
+                ohos:background_element="#cccccc"
+                ohos:text_alignment="center"
+                ohos:text="High Imitation Palm Hero Alliance APP Radar Map" />
+
+        </DirectionalLayout>
+
+    </ScrollView>
+
+</DirectionalLayout>

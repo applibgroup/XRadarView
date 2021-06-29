@@ -1,0 +1,24 @@
+{
+  "string": [
+    {
+      "name": "app_name",
+      "value": "XRadarView"
+    },
+    {
+      "name": "mainability_description",
+      "value": "Java_Phone_Empty Feature Ability"
+    },
+    {
+      "name": "mainability_HelloWorld",
+      "value": "Hello World"
+    },
+    {
+      "name": "demoability_description",
+      "value": "Java_Phone_Empty Feature Ability"
+    },
+    {
+      "name": "demoability_HelloWorld",
+      "value": "Hello World"
+    }
+  ]
+}
