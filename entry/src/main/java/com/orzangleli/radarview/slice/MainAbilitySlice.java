@@ -292,23 +292,8 @@ public class MainAbilitySlice extends AbilitySlice implements AbsButton.CheckedS
                 }
                 break;
             case ResourceTable.Id_drawRichText:
-                if (isChecked) {
-                    // Note that if you use rich text, only the tittles field is displayed, so you can manually stitch values behind the tips
-                    /*SpannableString ss = new SpannableString("Plain text\nvalue is 0.1");
-                    ss.setSpan(new AbsoluteSizeSpan(30), 0, 3, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    ss.setSpan(new ForegroundColorSpan(Color.RED), 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    ss.setSpan(new ForegroundColorSpan(Color.GREEN), 1, 2, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    ss.setSpan(new BackgroundColorSpan(Color.YELLOW), 1, 2, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    ss.setSpan(new ForegroundColorSpan(Color.BLUE), 2, 3, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    ss.setSpan(new AbsoluteSizeSpan(10), 4, ss.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    titles[0] = ss;
-                    radarView.setTitles(titles);*/
-                    titles[0] = "kill";
-                    radarView.setTitles(titles);
-                } else {
-                    titles[0] = "kill";
-                    radarView.setTitles(titles);
-                }
+                titles[0] = "kill";
+                radarView.setTitles(titles);
                 break;
         }
     }

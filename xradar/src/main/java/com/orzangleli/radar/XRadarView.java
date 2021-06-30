@@ -5,11 +5,18 @@ import ohos.agp.animation.AnimatorValue;
 import ohos.agp.colors.RgbPalette;
 import ohos.agp.components.AttrSet;
 import ohos.agp.components.Component;
-import ohos.agp.render.*;
+import ohos.agp.render.Canvas;
+import ohos.agp.render.LinearShader;
+import ohos.agp.render.Paint;
+import ohos.agp.render.Shader;
+import ohos.agp.render.Path;
+import ohos.agp.render.PixelMapHolder;
 import ohos.agp.text.SimpleTextLayout;
-import ohos.agp.utils.*;
+import ohos.agp.utils.Color;
+import ohos.agp.utils.Matrix;
+import ohos.agp.utils.Point;
+import ohos.agp.utils.Rect;
 import ohos.app.Context;
-import ohos.hiviewdfx.HiLog;
 import ohos.hiviewdfx.HiLogLabel;
 import ohos.media.image.PixelMap;
 import ohos.media.image.common.Size;
@@ -133,7 +140,7 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
     private Paint cobwebPaint;
     private Paint dataPaint;
     private Paint singlePaint;
-    private TextPaint titlePaint;
+    private Paint titlePaint;
     private Paint layerPaint;
     private Paint pointPaint;
     private Paint radiusPaint;
@@ -228,7 +235,7 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
         singlePaint.setAntiAlias(true);
         singlePaint.setStyle(Paint.Style.FILLANDSTROKE_STYLE);
 
-        titlePaint = new TextPaint();
+        titlePaint = new Paint();
         titlePaint.setTextSize(titleSize);
         titlePaint.setColor(titleColor);
         titlePaint.setAntiAlias(true);
@@ -269,21 +276,19 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
 
     @Override
     public boolean onTouchEvent(Component component, TouchEvent touchEvent) {
-        HiLog.info(LABEL_LOG, "%{public}s", "onTouchEvent called");
-        switch (touchEvent.getAction()) {
-            case TouchEvent.PRIMARY_POINT_DOWN:
-                int x = (int) touchEvent.getPointerPosition(touchEvent.getIndex()).getX();
-                int y = (int) touchEvent.getPointerPosition(touchEvent.getIndex()).getY();
-                for (int i = 0; i < titleRects.size(); i++) {
-                    Rect rect = titleRects.get(i);
-                    if (rect != null && rect.contains(x, y, x, y)) {
-                        if (onTitleClickListener != null) {
-                            onTitleClickListener.onTitleClick(XRadarView.this, i, x, y, rect);
-                            return true;
-                        }
+
+        if (touchEvent.getAction() == TouchEvent.PRIMARY_POINT_DOWN) {
+            int x = (int) touchEvent.getPointerPosition(touchEvent.getIndex()).getX();
+            int y = (int) touchEvent.getPointerPosition(touchEvent.getIndex()).getY();
+            for (int i = 0; i < titleRects.size(); i++) {
+                Rect rect = titleRects.get(i);
+                if (rect != null && rect.contains(x, y, x, y)) {
+                    if (onTitleClickListener != null) {
+                        onTitleClickListener.onTitleClick(XRadarView.this, i, x, y, rect);
+                        return true;
                     }
                 }
-                break;
+            }
         }
         return false;
     }
@@ -296,7 +301,7 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
         public void onRefreshed(Component component) {
             int w = component.getWidth();
             int h = component.getHeight();
-            radius = Math.min(h, w) / 2 * radarPercent;
+            radius = Math.min(h, w) / 2.0f * radarPercent;
             MAX_TEXT_WIDTH = (int) (Math.min(h, w) / 2 * (1 - radarPercent));
             //The central coordinates
             centerX = w / 2;
@@ -431,7 +436,7 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
      * @param endColor   end color
      */
     private void drawLayer(Canvas canvas, Color startColor, Color endColor) {
-        Path path = null;
+        Path path;
         Path prePath = null;
         float r = radius / layerCount;
         for (int i = layerCount; i >= 0; i--) {
@@ -450,9 +455,9 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
             }
 
             if (prePath != null) {
+                prePath.close();
                 if (i != 0) {
-                    //    prePath.op(path, Path.Op.DIFFERENCE);
-                    prePath.close();
+
                     // Calculate the gradient color
                     int a0 = Color.alpha(startColor.getValue());
                     int r0 = (startColor.getValue() >> 16) & 0xFF;
@@ -471,7 +476,6 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
 
                     layerPaint.setColor(new Color(Color.argb(a2, r2, g2, b2)));
                 } else {
-                    prePath.close();
                     layerPaint.setColor(startColor);
                 }
                 canvas.drawPath(prePath, layerPaint);
@@ -489,9 +493,8 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
      * @param canvas instance of Canvas
      */
     private void drawText(Canvas canvas) {
-        Paint.FontMetrics fontMetrics = titlePaint.getFontMetrics();
         for (int i = 0; i < count; i++) {
-            float x = 0f, y = 0f, curAngle;
+            float x, y, curAngle;
 
             x = (float) (centerX + (radius) * Math.cos(angle * i + Math.PI / 2));
             y = (float) (centerY - (radius) * Math.sin(angle * i + Math.PI / 2));
@@ -509,11 +512,11 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
             }
             if (Math.abs(curAngle - 3 * Math.PI / 2) < 0.1 || Math.abs(curAngle - Math.PI / 2) < 0.1) {
                 if (Math.abs(curAngle - Math.PI / 2) < 0.1) {
-                    drawMultiLinesTextAndIcon(canvas, x - MAX_TEXT_WIDTH / 2, y, ss, drawables[i], 1, i);
+                    drawMultiLinesTextAndIcon(canvas, x - MAX_TEXT_WIDTH / 2.0f, y, ss, drawables[i], 1, i);
                 } else if (Math.abs(curAngle - Math.PI * 3 / 2) < 0.1) {
-                    drawMultiLinesTextAndIcon(canvas, x - MAX_TEXT_WIDTH / 2, y, ss, drawables[i], -1, i);
+                    drawMultiLinesTextAndIcon(canvas, x - MAX_TEXT_WIDTH / 2.0f, y, ss, drawables[i], -1, i);
                 } else {
-                    drawMultiLinesTextAndIcon(canvas, x - MAX_TEXT_WIDTH / 2, y, ss, drawables[i], 0, i);
+                    drawMultiLinesTextAndIcon(canvas, x - MAX_TEXT_WIDTH / 2.0f, y, ss, drawables[i], 0, i);
                 }
             } else if (curAngle >= 0 && curAngle < Math.PI / 2) {
                 drawMultiLinesTextAndIcon(canvas, x + descPadding, y, ss, drawables[i], 0, i);
@@ -654,7 +657,7 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
      * @param position      position
      */
     private void drawMultiLinesTextAndIcon(Canvas canvas, float x, float y, CharSequence text, int drawable, int verticalValue, int position) {
-        int drawableAvaiable = 1;
+        int drawableAvaiable;
         try {
             this.getContext().getResourceManager().getResource(drawable);
             drawableAvaiable = 1;
@@ -680,7 +683,7 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
             canvas.translate(x, y + descPadding);
             rect = new Rect((int) x, (int) (y + descPadding), (int) x + rectWidth, (int) (y + descPadding) + layout.getHeight());
         } else {
-            canvas.translate(x, y - layout.getHeight() / 2);
+            canvas.translate(x, y - layout.getHeight() / 2.0f);
             rect = new Rect((int) x, (int) (y - layout.getHeight() / 2), (int) x + rectWidth, (int) (y - layout.getHeight() / 2) + layout.getHeight());
         }
         titleRects.set(position, rect);
@@ -693,11 +696,11 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
             PixelMapHolder pixelMapHolder = new PixelMapHolder(pixelmap);
             if (pixelmap != null) {
                 if (verticalValue == 1) {
-                    canvas.drawPixelMapHolder(pixelMapHolder, x + layout.getWidth(), y - drawableSize * drawableAvaiable / 2 - layout.getHeight() / 2 - descPadding, titlePaint);
+                    canvas.drawPixelMapHolder(pixelMapHolder, x + layout.getWidth(), y - drawableSize * drawableAvaiable / 2.0f - layout.getHeight() / 2.0f - descPadding, titlePaint);
                 } else if (verticalValue == -1) {
-                    canvas.drawPixelMapHolder(pixelMapHolder, x + layout.getWidth(), y + descPadding + layout.getHeight() / 2 - drawableSize * drawableAvaiable / 2, titlePaint);
+                    canvas.drawPixelMapHolder(pixelMapHolder, x + layout.getWidth(), y + descPadding + layout.getHeight() / 2.0f - drawableSize * drawableAvaiable / 2.0f, titlePaint);
                 } else {
-                    canvas.drawPixelMapHolder(pixelMapHolder, x + layout.getWidth(), y - drawableSize * drawableAvaiable / 2, titlePaint);
+                    canvas.drawPixelMapHolder(pixelMapHolder, x + layout.getWidth(), y - drawableSize * drawableAvaiable / 2.0f, titlePaint);
                 }
                 pixelmap.release();
             }
@@ -1351,34 +1354,5 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
         this.shaderPositions = positions;
         postLayout();
         invalidate();
-    }
-
-    /**
-     * Get path rect.
-     *
-     * @return instance of RectF.
-     */
-    public RectF getPathRect() {
-        List<Point> list = new ArrayList<>();
-        for (int i = 0; i < count; i++) {
-            int x, y;
-            x = (int) (centerX + percents[i] * radius * Math.cos(angle * i + Math.PI / 2));
-            y = (int) (centerY - percents[i] * radius * Math.sin(angle * i + Math.PI / 2));
-            Point p = new Point(x, y);
-            list.add(p);
-        }
-
-        Path path = new Path();
-        for (int i = 0; i < list.size(); i++) {
-            if (i == 0) {
-                path.moveTo(list.get(i).getPointX(), list.get(i).getPointY());
-            } else {
-                path.lineTo(list.get(i).getPointX(), list.get(i).getPointY());
-            }
-        }
-        path.close();
-        RectF rect = new RectF();
-        path.computeBounds(rect);
-        return rect;
     }
 }

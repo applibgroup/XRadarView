@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/XRadarView.iml" filepath="$PROJECT_DIR$/.idea/modules/XRadarView.iml" group="XRadarView" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/entry/entry.iml" filepath="$PROJECT_DIR$/.idea/modules/entry/entry.iml" group="XRadarView/entry" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/xradar/xradar.iml" filepath="$PROJECT_DIR$/.idea/modules/xradar/xradar.iml" group="XRadarView/xradar" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/XRadarView-1.iml" filepath="$PROJECT_DIR$/.idea/modules/XRadarView-1.iml" group="XRadarView-1" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/entry/entry.iml" filepath="$PROJECT_DIR$/.idea/modules/entry/entry.iml" group="XRadarView-1/entry" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/xradar/xradar.iml" filepath="$PROJECT_DIR$/.idea/modules/xradar/xradar.iml" group="XRadarView-1/xradar" />
     </modules>
   </component>
 </project>

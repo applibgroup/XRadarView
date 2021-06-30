@@ -20,7 +20,7 @@
         ohos:text_alignment="left|vertical_center"
         ohos:left_padding="20vp"
         ohos:text_size="20fp"
-        ohos:text="Configuration  options" />
+        ohos:text="$string:title_configuration_option" />
 
     <ScrollView
         ohos:width="match_parent"
@@ -40,7 +40,7 @@
                 ohos:text_alignment="left|vertical_center"
                 ohos:left_padding="20vp"
                 ohos:text_size="14fp"
-                ohos:text="positive hexagon" />
+                ohos:text="$string:lable_positive_hexagon" />
 
             <DirectionalLayout
                 ohos:width="match_parent"
@@ -52,7 +52,7 @@
                     ohos:height="match_parent"
                     ohos:text_size="14fp"
                     ohos:text_alignment="vertical_center"
-                    ohos:text="3" />
+                    ohos:text="$string:txt_val_3" />
 
                 <Slider
                     ohos:id="$+id:seekBar"
@@ -67,7 +67,7 @@
                     ohos:height="match_parent"
                     ohos:text_size="14fp"
                     ohos:text_alignment="vertical_center"
-                    ohos:text="7" />
+                    ohos:text="$string:txt_val_7" />
 
             </DirectionalLayout>
 
@@ -79,7 +79,7 @@
                 ohos:text_size="14fp"
                 ohos:text_alignment="left|vertical_center"
                 ohos:left_padding="20vp"
-                ohos:text="layer number 5" />
+                ohos:text="$string:lable_layer_number" />
 
             <DirectionalLayout
                 ohos:width="match_parent"
@@ -91,7 +91,7 @@
                     ohos:height="match_parent"
                     ohos:text_size="14fp"
                     ohos:text_alignment="vertical_center"
-                    ohos:text="0" />
+                    ohos:text="$string:txt_val_0" />
 
                 <Slider
                     ohos:id="$+id:seekBar2"
@@ -106,7 +106,7 @@
                     ohos:height="match_parent"
                     ohos:text_size="14fp"
                     ohos:text_alignment="vertical_center"
-                    ohos:text="10" />
+                    ohos:text="$string:txt_val_10" />
 
             </DirectionalLayout>
 
@@ -117,7 +117,7 @@
                 ohos:text_size="14fp"
                 ohos:text_alignment="left|vertical_center"
                 ohos:left_padding="20vp"
-                ohos:text="Icon  size" />
+                ohos:text="$string:lable_icon_size" />
 
             <DirectionalLayout
                 ohos:width="match_parent"
@@ -129,7 +129,7 @@
                     ohos:height="match_parent"
                     ohos:text_size="14fp"
                     ohos:text_alignment="vertical_center"
-                    ohos:text="20" />
+                    ohos:text="$string:txt_val_20" />
 
                 <Slider
                     ohos:id="$+id:seekBar3"
@@ -144,7 +144,7 @@
                     ohos:height="match_parent"
                     ohos:text_size="14fp"
                     ohos:text_alignment="vertical_center"
-                    ohos:text="40" />
+                    ohos:text="$string:txt_val_40" />
 
             </DirectionalLayout>
 
@@ -155,7 +155,7 @@
                 ohos:text_size="14fp"
                 ohos:text_alignment="left|vertical_center"
                 ohos:left_padding="20vp"
-                ohos:text="Title text size" />
+                ohos:text="$string:lable_title_text_size" />
 
             <DirectionalLayout
                 ohos:width="match_parent"
@@ -167,7 +167,7 @@
                     ohos:height="match_parent"
                     ohos:text_size="14fp"
                     ohos:text_alignment="vertical_center"
-                    ohos:text="30" />
+                    ohos:text="$string:txt_val_30" />
 
                 <Slider
                     ohos:id="$+id:seekBar4"
@@ -182,7 +182,7 @@
                     ohos:height="match_parent"
                     ohos:text_size="14fp"
                     ohos:text_alignment="vertical_center"
-                    ohos:text="50" />
+                    ohos:text="$string:txt_val_50" />
 
             </DirectionalLayout>
 
@@ -193,7 +193,7 @@
                 ohos:text_size="14fp"
                 ohos:text_alignment="left|vertical_center"
                 ohos:left_padding="20vp"
-                ohos:text="Draw Boundary Line" />
+                ohos:text="$string:lable_draw_boundary_line" />
 
             <ToggleButton
                 ohos:id="$+id:drawBorder"
@@ -215,14 +215,14 @@
                 ohos:text_size="14fp"
                 ohos:text_alignment="left|vertical_center"
                 ohos:left_padding="20vp"
-                ohos:text="On Animation" />
+                ohos:text="$string:lable_on_animation" />
 
             <Button
                 ohos:id="$+id:loadAnimation"
                 ohos:width="match_content"
                 ohos:height="match_content"
                 ohos:layout_alignment="center"
-                ohos:text="Load  Animation"
+                ohos:text="$string:btn_txt_load_animation"
                 ohos:left_padding="16vp"
                 ohos:right_padding="16vp"
                 ohos:top_padding="8vp"
@@ -239,7 +239,7 @@
                 ohos:text_size="14fp"
                 ohos:text_alignment="left|vertical_center"
                 ohos:left_padding="20vp"
-                ohos:text="Draw dots" />
+                ohos:text="$string:lable_draw_dots" />
 
             <ToggleButton
                 ohos:id="$+id:drawPoint"
@@ -261,7 +261,7 @@
                 ohos:text_size="14fp"
                 ohos:text_alignment="left|vertical_center"
                 ohos:left_padding="20vp"
-                ohos:text="Draw  Grid" />
+                ohos:text="$string:lable_draw_grid" />
 
             <ToggleButton
                 ohos:id="$+id:drawPolygon"
@@ -283,7 +283,7 @@
                 ohos:text_size="14fp"
                 ohos:text_alignment="left|vertical_center"
                 ohos:left_padding="20vp"
-                ohos:text="Draw  Gradient Ring" />
+                ohos:text="$string:lable_draw_gradient_ring" />
 
             <ToggleButton
                 ohos:id="$+id:drawShade"
@@ -305,7 +305,7 @@
                 ohos:text_size="14fp"
                 ohos:text_alignment="left|vertical_center"
                 ohos:left_padding="20vp"
-                ohos:text="Multi-color distinguished area" />
+                ohos:text="$string:lable_multi_color_distinguished_area" />
 
             <ToggleButton
                 ohos:id="$+id:drawMultiColor"
@@ -327,7 +327,7 @@
                 ohos:text_size="14fp"
                 ohos:text_alignment="left|vertical_center"
                 ohos:left_padding="20vp"
-                ohos:text="Area Color  Gradient" />
+                ohos:text="$string:lable_area_color_gradient" />
 
             <ToggleButton
                 ohos:id="$+id:regionSupportShader"
@@ -349,7 +349,7 @@
                 ohos:text_size="14fp"
                 ohos:text_alignment="left|vertical_center"
                 ohos:left_padding="20vp"
-                ohos:text="Is it a circular outline" />
+                ohos:text="$string:lable_is_it_circular_outline" />
 
             <ToggleButton
                 ohos:id="$+id:regionCircle"
@@ -371,7 +371,7 @@
                 ohos:text_size="14fp"
                 ohos:text_alignment="left|vertical_center"
                 ohos:left_padding="20vp"
-                ohos:text="Draw  Radius" />
+                ohos:text="$string:lable_draw_radius" />
 
             <ToggleButton
                 ohos:id="$+id:drawRadius"
@@ -393,7 +393,7 @@
                 ohos:text_size="14fp"
                 ohos:text_alignment="left|vertical_center"
                 ohos:left_padding="20vp"
-                ohos:text="Draw  text" />
+                ohos:text="$string:lable_draw_text" />
 
             <ToggleButton
                 ohos:id="$+id:drawText"
@@ -415,7 +415,7 @@
                 ohos:text_size="14fp"
                 ohos:text_alignment="left|vertical_center"
                 ohos:left_padding="20vp"
-                ohos:text="Show icons" />
+                ohos:text="$string:lable_show_icons" />
 
             <ToggleButton
                 ohos:id="$+id:drawIcon"
@@ -437,7 +437,7 @@
                 ohos:text_size="14fp"
                 ohos:text_alignment="left|vertical_center"
                 ohos:left_padding="20vp"
-                ohos:text="Rich text title" />
+                ohos:text="$string:lable_rich_text_title" />
 
             <ToggleButton
                 ohos:id="$+id:drawRichText"
@@ -459,7 +459,7 @@
                 ohos:text_size="14fp"
                 ohos:background_element="#cccccc"
                 ohos:text_alignment="center"
-                ohos:text="Click on the title in the radar map to try ." />
+                ohos:text="$string:btn_txt_click_on_title_in_the_radar_map" />
 
             <Text
                 ohos:id="$+id:jump"
@@ -469,7 +469,7 @@
                 ohos:text_size="14fp"
                 ohos:background_element="#cccccc"
                 ohos:text_alignment="center"
-                ohos:text="High Imitation Palm Hero Alliance APP Radar Map" />
+                ohos:text="$string:btn_txt_high_imitation_plan_hero_allieance_app_radar_map" />
 
         </DirectionalLayout>
 

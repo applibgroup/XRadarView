@@ -47,3 +47,70 @@ XRadarView supports a high degree of customization, and its adjustable attribute
 ![](https://github.com/Click2cloud-Eros/XRadarView_main/blob/main/screenshot/Screenshot%20(4).png)
 
 ## how to use
+#### Installation
+Adds the following dependencies to the entry level build.gradle file:
+
+    implementation 'com.orzangleli:xradar:1.0.4'
+    
+Add XRadarView in layout file: 
+
+    <com.orzangleli.radar.XRadarView
+        ohos:id="$+id:radarView"
+        ohos:height="match_parent"
+        ohos:width="match_parent"
+        ohos:count="7"
+        ohos:layerCount="4"
+        ohos:enabledBorder="true"
+        ohos:borderColor="#ff0000"
+        ohos:boundaryWidth="4"
+        ohos:radiusColor="#88D3D8"
+        ohos:enabledShowPoint="false"
+        ohos:startColor="#278892"
+        ohos:endColor="#D4F0F2"
+        ohos:titleColor="#000"
+        ohos:descPadding="16"
+        />
+        
+Configure runtime in java file:
+
+    XRadarView radarView = (XRadarView) this.findComponentById(ResourceTable.Id_radarView);
+    
+        // The scale of values in the radar chart
+        radarView.setPercents(percents);
+        // Sets an array of colors for each area
+        // If colors are set, each area will display a different color, otherwise all areas will display the same color Action 1
+        radarView.setColors(null);
+        // Set each title
+        radarView.setTitles(titles);
+        // Set title color
+        radarView.setTitleColor(Color.RED);
+        // Set the text of the values displayed by each item
+        radarView.setValues(values);
+        // Set the icon for each item
+        radarView.setDrawables(drawables);
+        // Set the drawable padding for each item
+        radarView.setDrawablePadding(20);
+        // The setting allows connections between points
+        radarView.setEnabledBorder(true);
+        // Show dots
+        radarView.setEnabledShowPoint(true);
+        // Set dots radius
+        radarView.setPointRadius(8);
+        // Set dots color
+        radarView.setPointColor(Color.RED);
+        // Draw positive n deformation
+        radarView.setEnabledPolygon(true);
+        // Draws a gradient ring
+        radarView.setEnabledShade(true);
+        // Draw the radius
+        radarView.setEnabledRadius(true);
+        // Draw titles, values, icons, etc
+        radarView.setEnabledText(true);
+        // Turn on the animation
+        radarView.setEnabledAnimation(true);
+        // Set the number of layers
+        radarView.setLayerCount(5);
+        // A single color without gradient colors
+        radarView.setSingleColor(new Color(RgbPalette.parse("#800000ff")));
+        
+Enjoy it!:smile:        
