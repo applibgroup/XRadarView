@@ -137,7 +137,7 @@
                     ohos:height="40vp"
                     ohos:weight="1"
                     ohos:max="20"
-                    ohos:progress="10" />
+                    ohos:progress="20" />
 
                 <Text
                     ohos:width="match_content"

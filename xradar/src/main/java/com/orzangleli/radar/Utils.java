@@ -10,6 +10,10 @@ import java.util.Optional;
 
 public class Utils {
 
+    private Utils() {
+        throw new IllegalStateException("Utility class");
+    }
+
     /**
      * get the path from id
      *
@@ -55,8 +59,7 @@ public class Utils {
             ImageSource source = ImageSource.create(asset, options);
             return Optional.ofNullable(source.createPixelmap(decodingOptions));
         } catch (IOException e) {
-            Optional.empty();
+            return Optional.empty();
         }
-        return Optional.empty();
     }
 }

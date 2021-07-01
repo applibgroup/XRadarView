@@ -17,7 +17,6 @@ import ohos.agp.utils.Matrix;
 import ohos.agp.utils.Point;
 import ohos.agp.utils.Rect;
 import ohos.app.Context;
-import ohos.hiviewdfx.HiLogLabel;
 import ohos.media.image.PixelMap;
 import ohos.media.image.common.Size;
 import ohos.multimodalinput.event.TouchEvent;
@@ -28,10 +27,6 @@ import java.util.List;
 import java.util.Optional;
 
 public class XRadarView extends Component implements Component.DrawTask, Component.TouchEventListener {
-
-    private static final String TAG = XRadarView.class.getSimpleName();
-
-    private static final HiLogLabel LABEL_LOG = new HiLogLabel(3, 0xD000F00, TAG);
 
     //attributes
     private static final String ATTRIBUTE_COUNT = "count";
@@ -282,11 +277,9 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
             int y = (int) touchEvent.getPointerPosition(touchEvent.getIndex()).getY();
             for (int i = 0; i < titleRects.size(); i++) {
                 Rect rect = titleRects.get(i);
-                if (rect != null && rect.contains(x, y, x, y)) {
-                    if (onTitleClickListener != null) {
-                        onTitleClickListener.onTitleClick(XRadarView.this, i, x, y, rect);
-                        return true;
-                    }
+                if (rect != null && rect.contains(x, y, x, y) && onTitleClickListener != null) {
+                    onTitleClickListener.onTitleClick(XRadarView.this, i, x, y, rect);
+                    return true;
                 }
             }
         }
@@ -456,32 +449,44 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
 
             if (prePath != null) {
                 prePath.close();
-                if (i != 0) {
-
-                    // Calculate the gradient color
-                    int a0 = Color.alpha(startColor.getValue());
-                    int r0 = (startColor.getValue() >> 16) & 0xFF;
-                    int g0 = (startColor.getValue() >> 8) & 0xFF;
-                    int b0 = startColor.getValue() & 0xFF;
-
-                    int a1 = Color.alpha(endColor.getValue());
-                    int r1 = (endColor.getValue() >> 16) & 0xFF;
-                    int g1 = (endColor.getValue() >> 8) & 0xFF;
-                    int b1 = endColor.getValue() & 0xFF;
-
-                    int a2 = (int) (1.0 * i * (a1 - a0) / layerCount + a0);
-                    int r2 = (int) (1.0 * i * (r1 - r0) / layerCount + r0);
-                    int g2 = (int) (1.0 * i * (g1 - g0) / layerCount + g0);
-                    int b2 = (int) (1.0 * i * (b1 - b0) / layerCount + b0);
-
-                    layerPaint.setColor(new Color(Color.argb(a2, r2, g2, b2)));
-                } else {
-                    layerPaint.setColor(startColor);
-                }
+                setLayerPaintColor(i, startColor, endColor);
                 canvas.drawPath(prePath, layerPaint);
             }
             prePath = path;
+        }
+    }
 
+    /**
+     * Set color in layer paint instance on the basis of layer number.
+     * If layer number is 0 then, set start color
+     * Else calculate the gradient color and set gradient color to it.
+     *
+     * @param layerNum   layer number
+     * @param startColor start color
+     * @param endColor   end color
+     */
+    private void setLayerPaintColor(int layerNum, Color startColor, Color endColor) {
+        if (layerNum != 0) {
+
+            // Calculate the gradient color
+            int a0 = Color.alpha(startColor.getValue());
+            int r0 = (startColor.getValue() >> 16) & 0xFF;
+            int g0 = (startColor.getValue() >> 8) & 0xFF;
+            int b0 = startColor.getValue() & 0xFF;
+
+            int a1 = Color.alpha(endColor.getValue());
+            int r1 = (endColor.getValue() >> 16) & 0xFF;
+            int g1 = (endColor.getValue() >> 8) & 0xFF;
+            int b1 = endColor.getValue() & 0xFF;
+
+            int a2 = (int) (1.0 * layerNum * (a1 - a0) / layerCount + a0);
+            int r2 = (int) (1.0 * layerNum * (r1 - r0) / layerCount + r0);
+            int g2 = (int) (1.0 * layerNum * (g1 - g0) / layerCount + g0);
+            int b2 = (int) (1.0 * layerNum * (b1 - b0) / layerCount + b0);
+
+            layerPaint.setColor(new Color(Color.argb(a2, r2, g2, b2)));
+        } else {
+            layerPaint.setColor(startColor);
         }
     }
 
@@ -499,25 +504,17 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
             x = (float) (centerX + (radius) * Math.cos(angle * i + Math.PI / 2));
             y = (float) (centerY - (radius) * Math.sin(angle * i + Math.PI / 2));
             curAngle = (float) (angle * i + Math.PI / 2);
+
             // The rest is in the range of 0-2PI
             curAngle = (float) (curAngle % (2 * Math.PI));
-            CharSequence ss;
-            if (values == null || values[i] == null) {
-                ss = titles[i];
-            } else {
-                ss = titles[i] + "\n" + values[i];
-            }
+
+            CharSequence ss = getTitleCharSequence(i);
+
             if (drawables == null) {
                 drawables = new int[count];
             }
             if (Math.abs(curAngle - 3 * Math.PI / 2) < 0.1 || Math.abs(curAngle - Math.PI / 2) < 0.1) {
-                if (Math.abs(curAngle - Math.PI / 2) < 0.1) {
-                    drawMultiLinesTextAndIcon(canvas, x - MAX_TEXT_WIDTH / 2.0f, y, ss, drawables[i], 1, i);
-                } else if (Math.abs(curAngle - Math.PI * 3 / 2) < 0.1) {
-                    drawMultiLinesTextAndIcon(canvas, x - MAX_TEXT_WIDTH / 2.0f, y, ss, drawables[i], -1, i);
-                } else {
-                    drawMultiLinesTextAndIcon(canvas, x - MAX_TEXT_WIDTH / 2.0f, y, ss, drawables[i], 0, i);
-                }
+                callDMLTAIMethodWithDifferentVerticalValue(canvas, curAngle, x, y, ss, i);
             } else if (curAngle >= 0 && curAngle < Math.PI / 2) {
                 drawMultiLinesTextAndIcon(canvas, x + descPadding, y, ss, drawables[i], 0, i);
             } else if (curAngle > 3 * Math.PI / 2 && curAngle <= Math.PI * 2) {
@@ -528,6 +525,42 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
                 drawMultiLinesTextAndIcon(canvas, x - MAX_TEXT_WIDTH, y, ss, drawables[i], 0, i);
             }
         }
+    }
+
+    /**
+     * Call Draw multi-Line text and icon method with different vertical value.
+     *
+     * @param canvas   instance of Canvas
+     * @param curAngle Curve angle
+     * @param x        x coordinate
+     * @param y        y coordinate
+     * @param ss       instance of CharSequence to draw text
+     * @param i        position
+     */
+    private void callDMLTAIMethodWithDifferentVerticalValue(Canvas canvas, float curAngle, float x, float y, CharSequence ss, int i) {
+        if (Math.abs(curAngle - Math.PI / 2) < 0.1) {
+            drawMultiLinesTextAndIcon(canvas, x - MAX_TEXT_WIDTH / 2.0f, y, ss, drawables[i], 1, i);
+        } else if (Math.abs(curAngle - Math.PI * 3 / 2) < 0.1) {
+            drawMultiLinesTextAndIcon(canvas, x - MAX_TEXT_WIDTH / 2.0f, y, ss, drawables[i], -1, i);
+        } else {
+            drawMultiLinesTextAndIcon(canvas, x - MAX_TEXT_WIDTH / 2.0f, y, ss, drawables[i], 0, i);
+        }
+    }
+
+    /**
+     * Get title and value in char sequence object.
+     *
+     * @param position index of title and value.
+     * @return Title and value in the form of CharSequence.
+     */
+    private CharSequence getTitleCharSequence(int position) {
+        CharSequence ss;
+        if (values == null || values[position] == null) {
+            ss = titles[position];
+        } else {
+            ss = titles[position] + "\n" + values[position];
+        }
+        return ss;
     }
 
     /**
@@ -564,9 +597,9 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
         PixelMap.InitializationOptions initializationOptions = new PixelMap.InitializationOptions();
         initializationOptions.size = new Size(newWidth, newHeight);
 
-        PixelMap newBm = PixelMap.create(pixelMap, initializationOptions);
+        PixelMap newPm = PixelMap.create(pixelMap, initializationOptions);
         pixelMap.release();
-        return newBm;
+        return newPm;
     }
 
     /**
@@ -667,10 +700,8 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
         int allowWidth = MAX_TEXT_WIDTH - descPadding;
         int rectWidth = allowWidth;
         Rect rect;
-        if (drawable != -1) {
-            if (allowWidth > drawableSize * drawableAvaiable + drawablePadding) {
-                allowWidth = allowWidth - drawableSize * drawableAvaiable - drawablePadding;
-            }
+        if (drawable != -1 && allowWidth > drawableSize * drawableAvaiable + drawablePadding) {
+            allowWidth = allowWidth - drawableSize * drawableAvaiable - drawablePadding;
         }
 
         titlePaint.setTextSize(titleSize);

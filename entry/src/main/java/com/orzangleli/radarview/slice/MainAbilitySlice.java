@@ -177,10 +177,12 @@ public class MainAbilitySlice extends AbilitySlice implements AbsButton.CheckedS
 
             @Override
             public void onTouchStart(Slider slider) {
+                // Do nothing
             }
 
             @Override
             public void onTouchEnd(Slider slider) {
+                // Do nothing
             }
         });
 
@@ -194,10 +196,12 @@ public class MainAbilitySlice extends AbilitySlice implements AbsButton.CheckedS
 
             @Override
             public void onTouchStart(Slider slider) {
+                // Do nothing
             }
 
             @Override
             public void onTouchEnd(Slider slider) {
+                // Do nothing
             }
         });
 
@@ -209,10 +213,12 @@ public class MainAbilitySlice extends AbilitySlice implements AbsButton.CheckedS
 
             @Override
             public void onTouchStart(Slider slider) {
+                // Do nothing
             }
 
             @Override
             public void onTouchEnd(Slider slider) {
+                // Do nothing
             }
         });
 
@@ -224,10 +230,12 @@ public class MainAbilitySlice extends AbilitySlice implements AbsButton.CheckedS
 
             @Override
             public void onTouchStart(Slider slider) {
+                // Do nothing
             }
 
             @Override
             public void onTouchEnd(Slider slider) {
+                // Do nothing
             }
         });
 
