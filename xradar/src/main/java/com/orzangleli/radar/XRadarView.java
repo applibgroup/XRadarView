@@ -1,5 +1,8 @@
 package com.orzangleli.radar;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import ohos.agp.animation.Animator;
 import ohos.agp.animation.AnimatorValue;
 import ohos.agp.colors.RgbPalette;
@@ -8,9 +11,9 @@ import ohos.agp.components.Component;
 import ohos.agp.render.Canvas;
 import ohos.agp.render.LinearShader;
 import ohos.agp.render.Paint;
-import ohos.agp.render.Shader;
 import ohos.agp.render.Path;
 import ohos.agp.render.PixelMapHolder;
+import ohos.agp.render.Shader;
 import ohos.agp.text.SimpleTextLayout;
 import ohos.agp.utils.Color;
 import ohos.agp.utils.Matrix;
@@ -22,10 +25,9 @@ import ohos.media.image.common.Size;
 import ohos.multimodalinput.event.TouchEvent;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
+/**
+ * XRadarView is a highly customizable radar view.
+ */
 public class XRadarView extends Component implements Component.DrawTask, Component.TouchEventListener {
 
     //attributes
@@ -114,8 +116,8 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
     // Whether to paint the radar area as a gradient color
     private boolean enabledRegionShader = false;
 
-
-    private int MAX_TEXT_WIDTH;  // Text maximum allowable width
+    // Text maximum allowable width
+    private int maxTextWidth;
 
     // The center of the circle for each edge
     private float angle;
@@ -178,33 +180,80 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
     private void init(AttrSet attrSet) {
 
         if (attrSet != null) {
-            count = attrSet.getAttr(ATTRIBUTE_COUNT).isPresent() ? attrSet.getAttr(ATTRIBUTE_COUNT).get().getIntegerValue() : 6;
-            layerCount = attrSet.getAttr(ATTRIBUTE_LAYER_COUNT).isPresent() ? attrSet.getAttr(ATTRIBUTE_LAYER_COUNT).get().getIntegerValue() : 6;
-            drawableSize = attrSet.getAttr(ATTRIBUTE_DRAWABLE_SIZE).isPresent() ? attrSet.getAttr(ATTRIBUTE_DRAWABLE_SIZE).get().getIntegerValue() : 40;
-            drawablePadding = attrSet.getAttr(ATTRIBUTE_DRAWABLE_PADDING).isPresent() ? attrSet.getAttr(ATTRIBUTE_DRAWABLE_PADDING).get().getIntegerValue() : 10;
-            descPadding = attrSet.getAttr(ATTRIBUTE_DESC_PADDING).isPresent() ? attrSet.getAttr(ATTRIBUTE_DESC_PADDING).get().getIntegerValue() : 5;
-            titleSize = attrSet.getAttr(ATTRIBUTE_TITLE_SIZE).isPresent() ? attrSet.getAttr(ATTRIBUTE_TITLE_SIZE).get().getIntegerValue() : 40;
-            dataSize = attrSet.getAttr(ATTRIBUTE_DATA_SIZE).isPresent() ? attrSet.getAttr(ATTRIBUTE_DATA_SIZE).get().getIntegerValue() : 30;
-            radarPercent = attrSet.getAttr(ATTRIBUTE_RADAR_PERCENT).isPresent() ? attrSet.getAttr(ATTRIBUTE_RADAR_PERCENT).get().getFloatValue() : 0.7f;
-            startColor = attrSet.getAttr(ATTRIBUTE_START_COLOR).isPresent() ? attrSet.getAttr(ATTRIBUTE_START_COLOR).get().getColorValue() : new Color(RgbPalette.parse("#80FFCC33"));
-            endColor = attrSet.getAttr(ATTRIBUTE_END_COLOR).isPresent() ? attrSet.getAttr(ATTRIBUTE_END_COLOR).get().getColorValue() : new Color(RgbPalette.parse("#80FFFFCC"));
-            cobwebColor = attrSet.getAttr(ATTRIBUTE_COBWEB_COLOR).isPresent() ? attrSet.getAttr(ATTRIBUTE_COBWEB_COLOR).get().getColorValue() : new Color(RgbPalette.parse("#80444444"));
-            dataColor = attrSet.getAttr(ATTRIBUTE_DATA_COLOR).isPresent() ? attrSet.getAttr(ATTRIBUTE_DATA_COLOR).get().getColorValue() : new Color(RgbPalette.parse("#00000000"));
-            singleColor = attrSet.getAttr(ATTRIBUTE_SINGLE_COLOR).isPresent() ? attrSet.getAttr(ATTRIBUTE_SINGLE_COLOR).get().getColorValue() : new Color(RgbPalette.parse("#80CC0000"));
-            titleColor = attrSet.getAttr(ATTRIBUTE_TITLE_COLOR).isPresent() ? attrSet.getAttr(ATTRIBUTE_TITLE_COLOR).get().getColorValue() : new Color(RgbPalette.parse("#80000000"));
-            pointColor = attrSet.getAttr(ATTRIBUTE_POINT_COLOR).isPresent() ? attrSet.getAttr(ATTRIBUTE_POINT_COLOR).get().getColorValue() : new Color(RgbPalette.parse("#80333366"));
-            borderColor = attrSet.getAttr(ATTRIBUTE_BORDER_COLOR).isPresent() ? attrSet.getAttr(ATTRIBUTE_BORDER_COLOR).get().getColorValue() : new Color(RgbPalette.parse("#80333366"));
-            radiusColor = attrSet.getAttr(ATTRIBUTE_RADIUS_COLOR).isPresent() ? attrSet.getAttr(ATTRIBUTE_RADIUS_COLOR).get().getColorValue() : new Color(RgbPalette.parse("#80CCCCCC"));
-            boundaryWidth = attrSet.getAttr(ATTRIBUTE_BOUNDARY_WIDTH).isPresent() ? attrSet.getAttr(ATTRIBUTE_BOUNDARY_WIDTH).get().getIntegerValue() : 5;
-            pointRadius = attrSet.getAttr(ATTRIBUTE_POINT_RADIUS).isPresent() ? attrSet.getAttr(ATTRIBUTE_POINT_RADIUS).get().getIntegerValue() : 10;
-            enabledBorder = attrSet.getAttr(ATTRIBUTE_ENABLED_BORDER).isPresent() && attrSet.getAttr(ATTRIBUTE_ENABLED_BORDER).get().getBoolValue();
-            enabledAnimation = !attrSet.getAttr(ATTRIBUTE_ENABLED_ANIMATION).isPresent() || attrSet.getAttr(ATTRIBUTE_ENABLED_ANIMATION).get().getBoolValue();
-            enabledShowPoint = !attrSet.getAttr(ATTRIBUTE_ENABLED_SHOW_POINT).isPresent() || attrSet.getAttr(ATTRIBUTE_ENABLED_SHOW_POINT).get().getBoolValue();
-            enabledPolygon = !attrSet.getAttr(ATTRIBUTE_ENABLED_POLYGON).isPresent() || attrSet.getAttr(ATTRIBUTE_ENABLED_POLYGON).get().getBoolValue();
-            enabledShade = !attrSet.getAttr(ATTRIBUTE_ENABLED_SHADE).isPresent() || attrSet.getAttr(ATTRIBUTE_ENABLED_SHADE).get().getBoolValue();
-            enabledRadius = !attrSet.getAttr(ATTRIBUTE_ENABLED_RADIUS).isPresent() || attrSet.getAttr(ATTRIBUTE_ENABLED_RADIUS).get().getBoolValue();
-            enabledText = !attrSet.getAttr(ATTRIBUTE_ENABLED_TEXT).isPresent() || attrSet.getAttr(ATTRIBUTE_ENABLED_TEXT).get().getBoolValue();
-            animDuration = attrSet.getAttr(ATTRIBUTE_ANIMATION_DURATION).isPresent() ? attrSet.getAttr(ATTRIBUTE_ANIMATION_DURATION).get().getIntegerValue() : 1000;
+            count = attrSet.getAttr(ATTRIBUTE_COUNT).isPresent()
+                    ? attrSet.getAttr(ATTRIBUTE_COUNT).get().getIntegerValue()
+                    : 6;
+            layerCount = attrSet.getAttr(ATTRIBUTE_LAYER_COUNT).isPresent()
+                    ? attrSet.getAttr(ATTRIBUTE_LAYER_COUNT).get().getIntegerValue()
+                    : 6;
+            drawableSize = attrSet.getAttr(ATTRIBUTE_DRAWABLE_SIZE).isPresent()
+                    ? attrSet.getAttr(ATTRIBUTE_DRAWABLE_SIZE).get().getIntegerValue()
+                    : 40;
+            drawablePadding = attrSet.getAttr(ATTRIBUTE_DRAWABLE_PADDING).isPresent()
+                    ? attrSet.getAttr(ATTRIBUTE_DRAWABLE_PADDING).get().getIntegerValue()
+                    : 10;
+            descPadding = attrSet.getAttr(ATTRIBUTE_DESC_PADDING).isPresent()
+                    ? attrSet.getAttr(ATTRIBUTE_DESC_PADDING).get().getIntegerValue()
+                    : 5;
+            titleSize = attrSet.getAttr(ATTRIBUTE_TITLE_SIZE).isPresent()
+                    ? attrSet.getAttr(ATTRIBUTE_TITLE_SIZE).get().getIntegerValue()
+                    : 40;
+            dataSize = attrSet.getAttr(ATTRIBUTE_DATA_SIZE).isPresent()
+                    ? attrSet.getAttr(ATTRIBUTE_DATA_SIZE).get().getIntegerValue()
+                    : 30;
+            radarPercent = attrSet.getAttr(ATTRIBUTE_RADAR_PERCENT).isPresent()
+                    ? attrSet.getAttr(ATTRIBUTE_RADAR_PERCENT).get().getFloatValue()
+                    : 0.7f;
+            startColor = attrSet.getAttr(ATTRIBUTE_START_COLOR).isPresent()
+                    ? attrSet.getAttr(ATTRIBUTE_START_COLOR).get().getColorValue()
+                    : new Color(RgbPalette.parse("#80FFCC33"));
+            endColor = attrSet.getAttr(ATTRIBUTE_END_COLOR).isPresent()
+                    ? attrSet.getAttr(ATTRIBUTE_END_COLOR).get().getColorValue()
+                    : new Color(RgbPalette.parse("#80FFFFCC"));
+            cobwebColor = attrSet.getAttr(ATTRIBUTE_COBWEB_COLOR).isPresent()
+                    ? attrSet.getAttr(ATTRIBUTE_COBWEB_COLOR).get().getColorValue()
+                    : new Color(RgbPalette.parse("#80444444"));
+            dataColor = attrSet.getAttr(ATTRIBUTE_DATA_COLOR).isPresent()
+                    ? attrSet.getAttr(ATTRIBUTE_DATA_COLOR).get().getColorValue()
+                    : new Color(RgbPalette.parse("#00000000"));
+            singleColor = attrSet.getAttr(ATTRIBUTE_SINGLE_COLOR).isPresent()
+                    ? attrSet.getAttr(ATTRIBUTE_SINGLE_COLOR).get().getColorValue()
+                    : new Color(RgbPalette.parse("#80CC0000"));
+            titleColor = attrSet.getAttr(ATTRIBUTE_TITLE_COLOR).isPresent()
+                    ? attrSet.getAttr(ATTRIBUTE_TITLE_COLOR).get().getColorValue()
+                    : new Color(RgbPalette.parse("#80000000"));
+            pointColor = attrSet.getAttr(ATTRIBUTE_POINT_COLOR).isPresent()
+                    ? attrSet.getAttr(ATTRIBUTE_POINT_COLOR).get().getColorValue()
+                    : new Color(RgbPalette.parse("#80333366"));
+            borderColor = attrSet.getAttr(ATTRIBUTE_BORDER_COLOR).isPresent()
+                    ? attrSet.getAttr(ATTRIBUTE_BORDER_COLOR).get().getColorValue()
+                    : new Color(RgbPalette.parse("#80333366"));
+            radiusColor = attrSet.getAttr(ATTRIBUTE_RADIUS_COLOR).isPresent()
+                    ? attrSet.getAttr(ATTRIBUTE_RADIUS_COLOR).get().getColorValue()
+                    : new Color(RgbPalette.parse("#80CCCCCC"));
+            boundaryWidth = attrSet.getAttr(ATTRIBUTE_BOUNDARY_WIDTH).isPresent()
+                    ? attrSet.getAttr(ATTRIBUTE_BOUNDARY_WIDTH).get().getIntegerValue()
+                    : 5;
+            pointRadius = attrSet.getAttr(ATTRIBUTE_POINT_RADIUS).isPresent()
+                    ? attrSet.getAttr(ATTRIBUTE_POINT_RADIUS).get().getIntegerValue()
+                    : 10;
+            enabledBorder = attrSet.getAttr(ATTRIBUTE_ENABLED_BORDER).isPresent()
+                    && attrSet.getAttr(ATTRIBUTE_ENABLED_BORDER).get().getBoolValue();
+            enabledAnimation = !attrSet.getAttr(ATTRIBUTE_ENABLED_ANIMATION).isPresent()
+                    || attrSet.getAttr(ATTRIBUTE_ENABLED_ANIMATION).get().getBoolValue();
+            enabledShowPoint = !attrSet.getAttr(ATTRIBUTE_ENABLED_SHOW_POINT).isPresent()
+                    || attrSet.getAttr(ATTRIBUTE_ENABLED_SHOW_POINT).get().getBoolValue();
+            enabledPolygon = !attrSet.getAttr(ATTRIBUTE_ENABLED_POLYGON).isPresent()
+                    || attrSet.getAttr(ATTRIBUTE_ENABLED_POLYGON).get().getBoolValue();
+            enabledShade = !attrSet.getAttr(ATTRIBUTE_ENABLED_SHADE).isPresent()
+                    || attrSet.getAttr(ATTRIBUTE_ENABLED_SHADE).get().getBoolValue();
+            enabledRadius = !attrSet.getAttr(ATTRIBUTE_ENABLED_RADIUS).isPresent()
+                    || attrSet.getAttr(ATTRIBUTE_ENABLED_RADIUS).get().getBoolValue();
+            enabledText = !attrSet.getAttr(ATTRIBUTE_ENABLED_TEXT).isPresent()
+                    || attrSet.getAttr(ATTRIBUTE_ENABLED_TEXT).get().getBoolValue();
+            animDuration = attrSet.getAttr(ATTRIBUTE_ANIMATION_DURATION).isPresent()
+                    ? attrSet.getAttr(ATTRIBUTE_ANIMATION_DURATION).get().getIntegerValue()
+                    : 1000;
 
         }
 
@@ -287,7 +336,7 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
     }
 
     /**
-     * RefreshListener updates when view is relayout
+     * RefreshListener updates when view is relayout.
      */
     class RefreshListener implements LayoutRefreshedListener {
         @Override
@@ -295,15 +344,15 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
             int w = component.getWidth();
             int h = component.getHeight();
             radius = Math.min(h, w) / 2.0f * radarPercent;
-            MAX_TEXT_WIDTH = (int) (Math.min(h, w) / 2 * (1 - radarPercent));
+            maxTextWidth = (int) (Math.min(h, w) / 2 * (1 - radarPercent));
             //The central coordinates
             centerX = w / 2;
             centerY = h / 2;
 
             if (regionShader == null && shaderColors != null) {
                 Point[] points = new Point[]{
-                        new Point(getLeft(), getTop()),
-                        new Point(getRight(), getBottom())
+                    new Point(getLeft(), getTop()),
+                    new Point(getRight(), getBottom())
                 };
                 regionShader = new LinearShader(points, shaderPositions, shaderColors, Shader.TileMode.CLAMP_TILEMODE);
             }
@@ -348,8 +397,10 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
      * @param scale  scale to calculate x and y coordinates
      */
     private void drawBorder(Canvas canvas, float scale) {
-        float curX, curY;
-        float nextX, nextY;
+        float curX;
+        float curY;
+        float nextX;
+        float nextY;
         for (int i = 0; i < count - 1; i++) {
             curX = (float) (centerX + Math.cos(angle * i + Math.PI / 2) * radius * percents[i] * scale);
             curY = (float) (centerY - Math.sin(angle * i + Math.PI / 2) * radius * percents[i] * scale);
@@ -376,7 +427,8 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
      */
     private void drawPoint(Canvas canvas, float scale) {
         for (int i = 0; i < count; i++) {
-            int x, y;
+            int x;
+            int y;
             x = (int) (centerX + scale * percents[i] * radius * Math.cos(angle * i + Math.PI / 2));
             y = (int) (centerY - scale * percents[i] * radius * Math.sin(angle * i + Math.PI / 2));
             canvas.drawCircle(x, y, pointRadius, pointPaint);
@@ -384,18 +436,23 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
     }
 
     /**
-     * Draws a line between the center of the circle and the vertex
+     * Draws a line between the center of the circle and the vertex.
      *
      * @param canvas instance of Canvas
      */
     private void drawRadius(Canvas canvas) {
         for (int i = 0; i < count; i++) {
-            canvas.drawLine(centerX, centerY, (float) (centerX + Math.cos(angle * i + Math.PI / 2) * radius), (float) (centerY - Math.sin(angle * i + Math.PI / 2) * radius), radiusPaint);
+            canvas.drawLine(
+                    centerX,
+                    centerY,
+                    (float) (centerX + Math.cos(angle * i + Math.PI / 2) * radius),
+                    (float) (centerY - Math.sin(angle * i + Math.PI / 2) * radius),
+                    radiusPaint);
         }
     }
 
     /**
-     * Draw cobwebs
+     * Draw cobwebs.
      *
      * @param canvas instance of Canvas
      */
@@ -412,7 +469,9 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
                     if (j == 0) {
                         path.moveTo(centerX, centerY - curR);
                     } else {
-                        path.lineTo((float) (centerX + Math.cos(angle * j + Math.PI / 2) * curR), (float) (centerY - Math.sin(angle * j + Math.PI / 2) * curR));
+                        path.lineTo(
+                                (float) (centerX + Math.cos(angle * j + Math.PI / 2) * curR),
+                                (float) (centerY - Math.sin(angle * j + Math.PI / 2) * curR));
                     }
                 }
                 path.close();
@@ -422,7 +481,7 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
     }
 
     /**
-     * Draw the colors of each layer
+     * Draw the colors of each layer.
      *
      * @param canvas     instance of Canvas
      * @param startColor start color
@@ -442,7 +501,9 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
                     if (j == 0) {
                         path.moveTo(centerX, centerY - curR);
                     } else {
-                        path.lineTo((float) (centerX + Math.cos(angle * j + Math.PI / 2) * curR), (float) (centerY - Math.sin(angle * j + Math.PI / 2) * curR));
+                        path.lineTo(
+                                (float) (centerX + Math.cos(angle * j + Math.PI / 2) * curR),
+                                (float) (centerY - Math.sin(angle * j + Math.PI / 2) * curR));
                     }
                 }
             }
@@ -492,14 +553,18 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
 
     /**
      * Draw text and icons.
-     * <B>Note:</B> Currently Rich text functionality not implemented because of SpannableString class not available in OHOS.
-     * And also dataSize attribute is also connected with this implementation. So for better understand please refer android library.
+     * <B>Note:</B> Currently Rich text functionality not implemented
+     * because of SpannableString class not available in OHOS.
+     * And also dataSize attribute is also connected with this implementation.
+     * So for better understand please refer android library.
      *
      * @param canvas instance of Canvas
      */
     private void drawText(Canvas canvas) {
         for (int i = 0; i < count; i++) {
-            float x, y, curAngle;
+            float x;
+            float y;
+            float curAngle;
 
             x = (float) (centerX + (radius) * Math.cos(angle * i + Math.PI / 2));
             y = (float) (centerY - (radius) * Math.sin(angle * i + Math.PI / 2));
@@ -514,15 +579,15 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
                 drawables = new int[count];
             }
             if (Math.abs(curAngle - 3 * Math.PI / 2) < 0.1 || Math.abs(curAngle - Math.PI / 2) < 0.1) {
-                callDMLTAIMethodWithDifferentVerticalValue(canvas, curAngle, x, y, ss, i);
+                callWithDiffVerticalVal(canvas, curAngle, x, y, ss, i);
             } else if (curAngle >= 0 && curAngle < Math.PI / 2) {
                 drawMultiLinesTextAndIcon(canvas, x + descPadding, y, ss, drawables[i], 0, i);
             } else if (curAngle > 3 * Math.PI / 2 && curAngle <= Math.PI * 2) {
                 drawMultiLinesTextAndIcon(canvas, x + descPadding, y, ss, drawables[i], 0, i);
             } else if (curAngle > Math.PI / 2 && curAngle <= Math.PI) {
-                drawMultiLinesTextAndIcon(canvas, x - MAX_TEXT_WIDTH, y, ss, drawables[i], 0, i);
+                drawMultiLinesTextAndIcon(canvas, x - maxTextWidth, y, ss, drawables[i], 0, i);
             } else if (curAngle >= Math.PI && curAngle < 3 * Math.PI / 2) {
-                drawMultiLinesTextAndIcon(canvas, x - MAX_TEXT_WIDTH, y, ss, drawables[i], 0, i);
+                drawMultiLinesTextAndIcon(canvas, x - maxTextWidth, y, ss, drawables[i], 0, i);
             }
         }
     }
@@ -537,13 +602,13 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
      * @param ss       instance of CharSequence to draw text
      * @param i        position
      */
-    private void callDMLTAIMethodWithDifferentVerticalValue(Canvas canvas, float curAngle, float x, float y, CharSequence ss, int i) {
+    private void callWithDiffVerticalVal(Canvas canvas, float curAngle, float x, float y, CharSequence ss, int i) {
         if (Math.abs(curAngle - Math.PI / 2) < 0.1) {
-            drawMultiLinesTextAndIcon(canvas, x - MAX_TEXT_WIDTH / 2.0f, y, ss, drawables[i], 1, i);
+            drawMultiLinesTextAndIcon(canvas, x - maxTextWidth / 2.0f, y, ss, drawables[i], 1, i);
         } else if (Math.abs(curAngle - Math.PI * 3 / 2) < 0.1) {
-            drawMultiLinesTextAndIcon(canvas, x - MAX_TEXT_WIDTH / 2.0f, y, ss, drawables[i], -1, i);
+            drawMultiLinesTextAndIcon(canvas, x - maxTextWidth / 2.0f, y, ss, drawables[i], -1, i);
         } else {
-            drawMultiLinesTextAndIcon(canvas, x - MAX_TEXT_WIDTH / 2.0f, y, ss, drawables[i], 0, i);
+            drawMultiLinesTextAndIcon(canvas, x - maxTextWidth / 2.0f, y, ss, drawables[i], 0, i);
         }
     }
 
@@ -603,7 +668,7 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
     }
 
     /**
-     * Draw an area in one color
+     * Draw an area in one color.
      *
      * @param canvas instance of Canvas
      * @param scale  scale to calculate x and y coordinates
@@ -618,7 +683,8 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
         }
         List<Point> list = new ArrayList<>();
         for (int i = 0; i < count; i++) {
-            int x, y;
+            int x;
+            int y;
             x = (int) (centerX + scale * percents[i] * radius * Math.cos(angle * i + Math.PI / 2));
             y = (int) (centerY - scale * percents[i] * radius * Math.sin(angle * i + Math.PI / 2));
             Point p = new Point(x, y);
@@ -639,7 +705,7 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
     }
 
     /**
-     * Draw areas in a variety of colors
+     * Draw areas in a variety of colors.
      *
      * @param canvas instance of Canvas
      * @param scale  scale to calculate x and y coordinates
@@ -649,7 +715,8 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
         int colorSize = colors.length;
         List<Point> list = new ArrayList<>();
         for (int i = 0; i < count; i++) {
-            int x, y;
+            int x;
+            int y;
             x = (int) (centerX + scale * percents[i] * radius * Math.cos(angle * i + Math.PI / 2));
             y = (int) (centerY - scale * percents[i] * radius * Math.sin(angle * i + Math.PI / 2));
             Point p = new Point(x, y);
@@ -679,7 +746,7 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
     }
 
     /**
-     * Draw multiple lines of text
+     * Draw multiple lines of text.
      *
      * @param canvas        instance of Canvas
      * @param x             x coordinate
@@ -689,7 +756,14 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
      * @param verticalValue vertical value
      * @param position      position
      */
-    private void drawMultiLinesTextAndIcon(Canvas canvas, float x, float y, CharSequence text, int drawable, int verticalValue, int position) {
+    private void drawMultiLinesTextAndIcon(
+            Canvas canvas,
+            float x,
+            float y,
+            CharSequence text,
+            int drawable,
+            int verticalValue,
+            int position) {
         int drawableAvaiable;
         try {
             this.getContext().getResourceManager().getResource(drawable);
@@ -697,7 +771,7 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
         } catch (Exception e) {
             drawableAvaiable = 0;
         }
-        int allowWidth = MAX_TEXT_WIDTH - descPadding;
+        int allowWidth = maxTextWidth - descPadding;
         int rectWidth = allowWidth;
         Rect rect;
         if (drawable != -1 && allowWidth > drawableSize * drawableAvaiable + drawablePadding) {
@@ -709,17 +783,29 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
         canvas.save();
         if (verticalValue == 1) {
             canvas.translate(x, y - layout.getHeight() - descPadding);
-            rect = new Rect((int) x, (int) (y - layout.getHeight() - descPadding), (int) x + rectWidth, (int) (y - layout.getHeight() - descPadding) + layout.getHeight());
+            rect = new Rect(
+                    (int) x,
+                    (int) (y - layout.getHeight() - descPadding),
+                    (int) x + rectWidth,
+                    (int) (y - layout.getHeight() - descPadding) + layout.getHeight());
         } else if (verticalValue == -1) {
             canvas.translate(x, y + descPadding);
-            rect = new Rect((int) x, (int) (y + descPadding), (int) x + rectWidth, (int) (y + descPadding) + layout.getHeight());
+            rect = new Rect(
+                    (int) x,
+                    (int) (y + descPadding),
+                    (int) x + rectWidth,
+                    (int) (y + descPadding) + layout.getHeight());
         } else {
             canvas.translate(x, y - layout.getHeight() / 2.0f);
-            rect = new Rect((int) x, (int) (y - layout.getHeight() / 2), (int) x + rectWidth, (int) (y - layout.getHeight() / 2) + layout.getHeight());
+            rect = new Rect(
+                    (int) x,
+                    (int) (y - layout.getHeight() / 2),
+                    (int) x + rectWidth,
+                    (int) (y - layout.getHeight() / 2) + layout.getHeight());
         }
         titleRects.set(position, rect);
         layout.drawText(canvas);
-        canvas.restore();//Don't forget restore
+        canvas.restore(); //Don't forget restore
 
         // Draw the icon
         if (drawableSize * drawableAvaiable != 0) {
@@ -727,11 +813,23 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
             PixelMapHolder pixelMapHolder = new PixelMapHolder(pixelmap);
             if (pixelmap != null) {
                 if (verticalValue == 1) {
-                    canvas.drawPixelMapHolder(pixelMapHolder, x + layout.getWidth(), y - drawableSize * drawableAvaiable / 2.0f - layout.getHeight() / 2.0f - descPadding, titlePaint);
+                    canvas.drawPixelMapHolder(
+                            pixelMapHolder,
+                            x + layout.getWidth(),
+                            y - drawableSize * drawableAvaiable / 2.0f - layout.getHeight() / 2.0f - descPadding,
+                            titlePaint);
                 } else if (verticalValue == -1) {
-                    canvas.drawPixelMapHolder(pixelMapHolder, x + layout.getWidth(), y + descPadding + layout.getHeight() / 2.0f - drawableSize * drawableAvaiable / 2.0f, titlePaint);
+                    canvas.drawPixelMapHolder(
+                            pixelMapHolder,
+                            x + layout.getWidth(),
+                            y + descPadding + layout.getHeight() / 2.0f - drawableSize * drawableAvaiable / 2.0f,
+                            titlePaint);
                 } else {
-                    canvas.drawPixelMapHolder(pixelMapHolder, x + layout.getWidth(), y - drawableSize * drawableAvaiable / 2.0f, titlePaint);
+                    canvas.drawPixelMapHolder(
+                            pixelMapHolder,
+                            x + layout.getWidth(),
+                            y - drawableSize * drawableAvaiable / 2.0f,
+                            titlePaint);
                 }
                 pixelmap.release();
             }
@@ -764,6 +862,9 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
         this.onTitleClickListener = onTitleClickListener;
     }
 
+    /**
+     * Interface to callback title click event.
+     */
     public interface OnTitleClickListener {
         void onTitleClick(XRadarView view, int position, int touchX, int touchY, Rect titleRect);
     }
@@ -837,7 +938,7 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
     }
 
     /**
-     * Set count
+     * Set count.
      *
      * @param count Edges in polygon.
      */
@@ -1019,7 +1120,7 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
     }
 
     /**
-     * Return the status of animation (Enabled or Disabled)
+     * Return the status of animation (Enabled or Disabled).
      *
      * @return true if the status of animation is enabled.
      */
@@ -1039,7 +1140,7 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
     }
 
     /**
-     * Return the status of showPoint (Enabled or Disabled)
+     * Return the status of showPoint (Enabled or Disabled).
      *
      * @return true if the status of showPoint is enabled.
      */
@@ -1158,7 +1259,7 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
     }
 
     /**
-     * Return the status of area border (Enabled or Disabled)
+     * Return the status of area border (Enabled or Disabled).
      *
      * @return true if the status of area border is enabled.
      */
@@ -1216,7 +1317,7 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
     }
 
     /**
-     * Return the status of draw polygon (Enabled or Disabled)
+     * Return the status of draw polygon (Enabled or Disabled).
      *
      * @return true if the status of polygon is enabled.
      */
@@ -1236,7 +1337,7 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
     }
 
     /**
-     * Return the status of area outline (Circular or not)
+     * Return the status of area outline (Circular or not).
      *
      * @return true if the status of area outline is circular.
      */
@@ -1256,7 +1357,7 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
     }
 
     /**
-     * Return the status of shade (enabled or disabled)
+     * Return the status of shade (enabled or disabled).
      *
      * @return true if the status of shade is enabled.
      */
@@ -1276,7 +1377,7 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
     }
 
     /**
-     * Return the status of radius (enabled or disabled)
+     * Return the status of radius (enabled or disabled).
      *
      * @return true if the status of radius is enabled.
      */
@@ -1296,7 +1397,7 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
     }
 
     /**
-     * Return the status of title (enabled or disabled)
+     * Return the status of title (enabled or disabled).
      *
      * @return true if the status of title is enabled.
      */
@@ -1336,7 +1437,7 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
     }
 
     /**
-     * Return the status of region shader (enabled or disabled)
+     * Return the status of region shader (enabled or disabled).
      *
      * @return true if the status of region shader is enabled.
      */

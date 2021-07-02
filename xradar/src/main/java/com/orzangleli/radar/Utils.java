@@ -1,13 +1,19 @@
 package com.orzangleli.radar;
 
+import java.io.IOException;
+import java.util.Optional;
 import ohos.app.Context;
-import ohos.global.resource.*;
+import ohos.global.resource.NotExistException;
+import ohos.global.resource.RawFileEntry;
+import ohos.global.resource.Resource;
+import ohos.global.resource.ResourceManager;
+import ohos.global.resource.WrongTypeException;
 import ohos.media.image.ImageSource;
 import ohos.media.image.PixelMap;
 
-import java.io.IOException;
-import java.util.Optional;
-
+/**
+ * Resource related utils.
+ */
 public class Utils {
 
     private Utils() {
@@ -15,7 +21,7 @@ public class Utils {
     }
 
     /**
-     * get the path from id
+     * get the path from id.
      *
      * @param context the context
      * @param id      the id
@@ -39,7 +45,7 @@ public class Utils {
     }
 
     /**
-     * get the pixel map
+     * get the pixel map.
      *
      * @param context the context
      * @param id      the id

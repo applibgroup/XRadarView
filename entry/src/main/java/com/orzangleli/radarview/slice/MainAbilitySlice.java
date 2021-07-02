@@ -5,12 +5,19 @@ import com.orzangleli.radarview.ResourceTable;
 import ohos.aafwk.ability.AbilitySlice;
 import ohos.aafwk.content.Intent;
 import ohos.agp.colors.RgbPalette;
-import ohos.agp.components.*;
+import ohos.agp.components.AbsButton;
+import ohos.agp.components.Button;
+import ohos.agp.components.Slider;
+import ohos.agp.components.Text;
+import ohos.agp.components.ToggleButton;
 import ohos.agp.utils.Color;
 import ohos.agp.window.dialog.ToastDialog;
 import ohos.hiviewdfx.HiLog;
 import ohos.hiviewdfx.HiLogLabel;
 
+/**
+ * Main ability slice to test all the functionality of XRadarView library.
+ */
 public class MainAbilitySlice extends AbilitySlice implements AbsButton.CheckedStateChangedListener {
 
     //Contants
@@ -19,23 +26,46 @@ public class MainAbilitySlice extends AbilitySlice implements AbsButton.CheckedS
 
     //Components
     XRadarView radarView;
-    Text countTextView, layerCountTextView, jump;
-    Slider seekBar, seekBar2, seekBar3, seekBar4;
-    ToggleButton drawBorder, drawPoint, drawPolygon, drawShade, drawMultiColor, regionSupportShader, regionCircle, drawRadius, drawText, drawIcon, drawRichText;
+    Text countTextView;
+    Text layerCountTextView;
+    Text jump;
+    Slider seekBar;
+    Slider seekBar2;
+    Slider seekBar3;
+    Slider seekBar4;
+    ToggleButton drawBorder;
+    ToggleButton drawPoint;
+    ToggleButton drawPolygon;
+    ToggleButton drawShade;
+    ToggleButton drawMultiColor;
+    ToggleButton regionSupportShader;
+    ToggleButton regionCircle;
+    ToggleButton drawRadius;
+    ToggleButton drawText;
+    ToggleButton drawIcon;
+    ToggleButton drawRichText;
     Button loadAnimation;
 
     //icon array
     final int[] drawables = new int[]{
-            ResourceTable.Media_icon,
-            ResourceTable.Media_icon,
-            ResourceTable.Media_icon,
-            ResourceTable.Media_icon,
-            ResourceTable.Media_icon,
-            ResourceTable.Media_icon,
-            ResourceTable.Media_icon};
+        ResourceTable.Media_icon,
+        ResourceTable.Media_icon,
+        ResourceTable.Media_icon,
+        ResourceTable.Media_icon,
+        ResourceTable.Media_icon,
+        ResourceTable.Media_icon,
+        ResourceTable.Media_icon};
 
     // title
-    final CharSequence[] titles = new CharSequence[]{"Kill", "Money", "Survival", "Defense", "Rubik's Cube", "Physics", "Assists", "wisdom"};
+    final CharSequence[] titles = new CharSequence[]{
+        "Kill",
+        "Money",
+        "Survival",
+        "Defense",
+        "Rubik's Cube",
+        "Physics",
+        "Assists",
+        "wisdom"};
 
     // Value for each property (0 to 1.0)
     final double[] percents = new double[]{0.8, 0.8, 0.9, 1, 0.6, 0.5, 0.77, 0.9};
@@ -108,7 +138,8 @@ public class MainAbilitySlice extends AbilitySlice implements AbsButton.CheckedS
         // The scale of values in the radar chart
         radarView.setPercents(percents);
         // Sets an array of colors for each area
-        // If colors are set, each area will display a different color, otherwise all areas will display the same color Action 1
+        // If colors are set, each area will display a different color,
+        // otherwise all areas will display the same color Action 1
         radarView.setColors(null);
         // Set each title
         radarView.setTitles(titles);
