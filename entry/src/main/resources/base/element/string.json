@@ -1,0 +1,128 @@
+{
+  "string": [
+    {
+      "name": "app_name",
+      "value": "XRadarView"
+    },
+    {
+      "name": "mainability_description",
+      "value": "Java_Phone_Empty Feature Ability"
+    },
+    {
+      "name": "demoability_description",
+      "value": "Java_Phone_Empty Feature Ability"
+    },
+    {
+      "name": "title_configuration_option",
+      "value": "Configuration  options"
+    },
+    {
+      "name": "lable_positive_hexagon",
+      "value": "positive hexagon"
+    },
+    {
+      "name": "lable_layer_number",
+      "value": "layer number 5"
+    },
+    {
+      "name": "lable_icon_size",
+      "value": "Icon  size"
+    },
+    {
+      "name": "lable_title_text_size",
+      "value": "Title text size"
+    },
+    {
+      "name": "lable_draw_boundary_line",
+      "value": "Draw Boundary Line"
+    },
+    {
+      "name": "lable_on_animation",
+      "value": "On Animation"
+    },
+    {
+      "name": "lable_draw_dots",
+      "value": "Draw dots"
+    },
+    {
+      "name": "lable_draw_grid",
+      "value": "Draw  Grid"
+    },
+    {
+      "name": "lable_draw_gradient_ring",
+      "value": "Draw  Gradient Ring"
+    },
+    {
+      "name": "lable_multi_color_distinguished_area",
+      "value": "Multi-color distinguished area"
+    },
+    {
+      "name": "lable_area_color_gradient",
+      "value": "Area Color  Gradient"
+    },
+    {
+      "name": "lable_is_it_circular_outline",
+      "value": "Is it a circular outline"
+    },
+    {
+      "name": "lable_draw_radius",
+      "value": "Draw  Radius"
+    },
+    {
+      "name": "lable_draw_text",
+      "value": "Draw  text"
+    },
+    {
+      "name": "lable_show_icons",
+      "value": "Show icons"
+    },
+    {
+      "name": "lable_rich_text_title",
+      "value": "Rich text title"
+    },
+    {
+      "name": "btn_txt_click_on_title_in_the_radar_map",
+      "value": "Click on the title in the radar map to try."
+    },
+    {
+      "name": "btn_txt_high_imitation_plan_hero_allieance_app_radar_map",
+      "value": "High Imitation Paln Hero Alliance APP Radar Map"
+    },
+    {
+      "name": "btn_txt_load_animation",
+      "value": "Load  Animation"
+    },
+    {
+      "name": "txt_val_50",
+      "value": "50"
+    },
+    {
+      "name": "txt_val_40",
+      "value": "40"
+    },
+    {
+      "name": "txt_val_30",
+      "value": "30"
+    },
+    {
+      "name": "txt_val_20",
+      "value": "20"
+    },
+    {
+      "name": "txt_val_10",
+      "value": "10"
+    },
+    {
+      "name": "txt_val_7",
+      "value": "7"
+    },
+    {
+      "name": "txt_val_3",
+      "value": "3"
+    },
+    {
+      "name": "txt_val_0",
+      "value": "0"
+    }
+  ]
+}

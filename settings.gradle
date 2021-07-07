@@ -1,1 +1,1 @@
-include ':app', ':xradar'
+include ':entry', ':xradar'

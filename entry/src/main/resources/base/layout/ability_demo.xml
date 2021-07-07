@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<DirectionalLayout
+    xmlns:ohos="http://schemas.huawei.com/res/ohos"
+    ohos:height="match_parent"
+    ohos:width="match_parent"
+    ohos:orientation="vertical">
+
+    <com.orzangleli.radar.XRadarView
+        ohos:id="$+id:radarView1"
+        ohos:height="match_parent"
+        ohos:width="match_parent"
+        ohos:count="7"
+        ohos:layerCount="4"
+        ohos:enabledBorder="true"
+        ohos:borderColor="#ff0000"
+        ohos:boundaryWidth="4"
+        ohos:radiusColor="#88D3D8"
+        ohos:enabledShowPoint="false"
+        ohos:startColor="#278892"
+        ohos:endColor="#D4F0F2"
+        ohos:titleColor="#000"
+        ohos:descPadding="16"
+        />
+
+</DirectionalLayout>
