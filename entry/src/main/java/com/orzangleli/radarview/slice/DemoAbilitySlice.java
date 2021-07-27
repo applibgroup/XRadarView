@@ -38,14 +38,4 @@ public class DemoAbilitySlice extends AbilitySlice {
         xRadarView.setPercents(percents);
         xRadarView.setDrawables(drawables);
     }
-
-    @Override
-    public void onActive() {
-        super.onActive();
-    }
-
-    @Override
-    public void onForeground(Intent intent) {
-        super.onForeground(intent);
-    }
 }

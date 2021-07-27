@@ -13,13 +13,13 @@
         ohos:layerCount="4"
         ohos:enabledBorder="true"
         ohos:borderColor="#ff0000"
-        ohos:boundaryWidth="4"
+        ohos:boundaryWidth="2vp"
         ohos:radiusColor="#88D3D8"
         ohos:enabledShowPoint="false"
         ohos:startColor="#278892"
         ohos:endColor="#D4F0F2"
         ohos:titleColor="#000"
-        ohos:descPadding="16"
+        ohos:descPadding="8vp"
         />
 
 </DirectionalLayout>

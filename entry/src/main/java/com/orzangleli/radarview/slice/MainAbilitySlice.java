@@ -274,16 +274,6 @@ public class MainAbilitySlice extends AbilitySlice implements AbsButton.CheckedS
     }
 
     @Override
-    public void onActive() {
-        super.onActive();
-    }
-
-    @Override
-    public void onForeground(Intent intent) {
-        super.onForeground(intent);
-    }
-
-    @Override
     public void onCheckedChanged(AbsButton absButton, boolean isChecked) {
         switch (absButton.getId()) {
             case ResourceTable.Id_drawBorder:
@@ -334,6 +324,9 @@ public class MainAbilitySlice extends AbilitySlice implements AbsButton.CheckedS
                 titles[0] = "kill";
                 radarView.setTitles(titles);
                 break;
+            default:{
+                //Do nothing
+            }
         }
     }
 }
