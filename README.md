@@ -43,18 +43,39 @@ XRadarView supports a high degree of customization, and its adjustable attribute
 |isCircle|Whether the area outline is circular|
 
 ## Screenshots
-![](https://github.com/Click2cloud-Eros/XRadarView_main/blob/main/screenshot/Screenshot%20(1).png)
-![](https://github.com/Click2cloud-Eros/XRadarView_main/blob/main/screenshot/Screenshot%20(2).png)
-![](https://github.com/Click2cloud-Eros/XRadarView_main/blob/main/screenshot/Screenshot%20(3).png)
-![](https://github.com/Click2cloud-Eros/XRadarView_main/blob/main/screenshot/Screenshot%20(4).png)
+![](https://github.com/applibgroup/XRadarView/blob/master/screenshot/Screenshot%20(1).png)
+![](https://github.com/applibgroup/XRadarView/blob/master/screenshot/Screenshot%20(2).png)
+![](https://github.com/applibgroup/XRadarView/blob/master/screenshot/Screenshot%20(3).png)
+![](https://github.com/applibgroup/XRadarView/blob/master/screenshot/Screenshot%20(4).png)
 
-## how to use
+## How to use
+
 #### Installation
-Adds the following dependencies to the entry level build.gradle file:
+1. For using XRadarView module in sample app, include the source code and add the below dependencies in entry/build.gradle to generate hap/support.har.
+```
+	dependencies {
+		implementation project(':xradar')
+        	implementation fileTree(dir: 'libs', include: ['*.har'])
+        	testCompile 'junit:junit:4.12'
+	}
+```
+2. For using XRadarView in separate application using har file, add the har file in the entry/libs folder and add the dependencies in entry/build.gradle file.
+```
+	dependencies {
+		implementation fileTree(dir: 'libs', include: ['*.har'])
+		testCompile 'junit:junit:4.12'
+	}
 
-    implementation 'com.orzangleli:xradar:1.0.4'
-    
-Add XRadarView in layout file: 
+```
+3. For using XRadarView from a remote repository in separate application, add the below dependencies in entry/build.gradle file.
+```
+	dependencies {
+		implementation 'dev.applibgroup:xradar:1.0.0'
+		testCompile 'junit:junit:4.12'
+	}
+```
+
+## Add XRadarView in layout file: 
 
     <com.orzangleli.radar.XRadarView
         ohos:id="$+id:radarView"
@@ -73,7 +94,7 @@ Add XRadarView in layout file:
         ohos:descPadding="16"
         />
         
-Configure runtime in java file:
+## Configure runtime in java file:
 
     XRadarView radarView = (XRadarView) this.findComponentById(ResourceTable.Id_radarView);
     
@@ -115,4 +136,15 @@ Configure runtime in java file:
         // A single color without gradient colors
         radarView.setSingleColor(new Color(RgbPalette.parse("#800000ff")));
         
-Enjoy it!:smile:        
+
+## License
+MIT License
+
+## Everything
+Support rotation angle
+Support custom title and radar chart distance  
+
+## Original Repository [Android] 
+https://github.com/hust201010701/XRadarView
+
+Enjoy it!:smile:      
