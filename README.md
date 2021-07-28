@@ -1,7 +1,5 @@
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=applibgroup_XRadarView&metric=alert_status)](https://sonarcloud.io/dashboard?id=applibgroup_XRadarView)
-
-# XRadarView
-XRadarView is a "A highly customizable radar view for Harmonyos". XRadarView is a highly customizable radar view control.
+# XRadarView [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=applibgroup_XRadarView&metric=alert_status)](https://sonarcloud.io/dashboard?id=applibgroup_XRadarView) [![Build](https://github.com/applibgroup/XRadarView/actions/workflows/main.yml/badge.svg)](https://github.com/applibgroup/XRadarView/actions/workflows/main.yml)
+XRadarView is a "A highly customizable radar view for Harmonyos". XRadarView is a highly customizable radar view control. 
 
 ## Attribute meaning
 XRadarView supports a high degree of customization, and its adjustable attributes and meanings are shown in the table below.
