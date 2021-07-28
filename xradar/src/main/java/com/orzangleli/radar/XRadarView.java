@@ -6,6 +6,7 @@ import java.util.Optional;
 import ohos.agp.animation.Animator;
 import ohos.agp.animation.AnimatorValue;
 import ohos.agp.colors.RgbPalette;
+import ohos.agp.components.Attr;
 import ohos.agp.components.AttrSet;
 import ohos.agp.components.Component;
 import ohos.agp.render.Canvas;
@@ -27,6 +28,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * XRadarView is a highly customizable radar view.
+ * Created by lixiancheng on 2017/9/18.
  */
 public class XRadarView extends Component implements Component.DrawTask, Component.TouchEventListener {
 
@@ -179,82 +181,89 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
 
     private void init(AttrSet attrSet) {
 
+        Optional<Attr> attr;
         if (attrSet != null) {
-            count = attrSet.getAttr(ATTRIBUTE_COUNT).isPresent()
-                    ? attrSet.getAttr(ATTRIBUTE_COUNT).get().getIntegerValue()
-                    : 6;
-            layerCount = attrSet.getAttr(ATTRIBUTE_LAYER_COUNT).isPresent()
-                    ? attrSet.getAttr(ATTRIBUTE_LAYER_COUNT).get().getIntegerValue()
-                    : 6;
-            drawableSize = attrSet.getAttr(ATTRIBUTE_DRAWABLE_SIZE).isPresent()
-                    ? attrSet.getAttr(ATTRIBUTE_DRAWABLE_SIZE).get().getIntegerValue()
-                    : 40;
-            drawablePadding = attrSet.getAttr(ATTRIBUTE_DRAWABLE_PADDING).isPresent()
-                    ? attrSet.getAttr(ATTRIBUTE_DRAWABLE_PADDING).get().getIntegerValue()
-                    : 10;
-            descPadding = attrSet.getAttr(ATTRIBUTE_DESC_PADDING).isPresent()
-                    ? attrSet.getAttr(ATTRIBUTE_DESC_PADDING).get().getIntegerValue()
-                    : 5;
-            titleSize = attrSet.getAttr(ATTRIBUTE_TITLE_SIZE).isPresent()
-                    ? attrSet.getAttr(ATTRIBUTE_TITLE_SIZE).get().getIntegerValue()
-                    : 40;
-            dataSize = attrSet.getAttr(ATTRIBUTE_DATA_SIZE).isPresent()
-                    ? attrSet.getAttr(ATTRIBUTE_DATA_SIZE).get().getIntegerValue()
-                    : 30;
-            radarPercent = attrSet.getAttr(ATTRIBUTE_RADAR_PERCENT).isPresent()
-                    ? attrSet.getAttr(ATTRIBUTE_RADAR_PERCENT).get().getFloatValue()
-                    : 0.7f;
-            startColor = attrSet.getAttr(ATTRIBUTE_START_COLOR).isPresent()
-                    ? attrSet.getAttr(ATTRIBUTE_START_COLOR).get().getColorValue()
-                    : new Color(RgbPalette.parse("#80FFCC33"));
-            endColor = attrSet.getAttr(ATTRIBUTE_END_COLOR).isPresent()
-                    ? attrSet.getAttr(ATTRIBUTE_END_COLOR).get().getColorValue()
-                    : new Color(RgbPalette.parse("#80FFFFCC"));
-            cobwebColor = attrSet.getAttr(ATTRIBUTE_COBWEB_COLOR).isPresent()
-                    ? attrSet.getAttr(ATTRIBUTE_COBWEB_COLOR).get().getColorValue()
-                    : new Color(RgbPalette.parse("#80444444"));
-            dataColor = attrSet.getAttr(ATTRIBUTE_DATA_COLOR).isPresent()
-                    ? attrSet.getAttr(ATTRIBUTE_DATA_COLOR).get().getColorValue()
-                    : new Color(RgbPalette.parse("#00000000"));
-            singleColor = attrSet.getAttr(ATTRIBUTE_SINGLE_COLOR).isPresent()
-                    ? attrSet.getAttr(ATTRIBUTE_SINGLE_COLOR).get().getColorValue()
-                    : new Color(RgbPalette.parse("#80CC0000"));
-            titleColor = attrSet.getAttr(ATTRIBUTE_TITLE_COLOR).isPresent()
-                    ? attrSet.getAttr(ATTRIBUTE_TITLE_COLOR).get().getColorValue()
-                    : new Color(RgbPalette.parse("#80000000"));
-            pointColor = attrSet.getAttr(ATTRIBUTE_POINT_COLOR).isPresent()
-                    ? attrSet.getAttr(ATTRIBUTE_POINT_COLOR).get().getColorValue()
-                    : new Color(RgbPalette.parse("#80333366"));
-            borderColor = attrSet.getAttr(ATTRIBUTE_BORDER_COLOR).isPresent()
-                    ? attrSet.getAttr(ATTRIBUTE_BORDER_COLOR).get().getColorValue()
-                    : new Color(RgbPalette.parse("#80333366"));
-            radiusColor = attrSet.getAttr(ATTRIBUTE_RADIUS_COLOR).isPresent()
-                    ? attrSet.getAttr(ATTRIBUTE_RADIUS_COLOR).get().getColorValue()
-                    : new Color(RgbPalette.parse("#80CCCCCC"));
-            boundaryWidth = attrSet.getAttr(ATTRIBUTE_BOUNDARY_WIDTH).isPresent()
-                    ? attrSet.getAttr(ATTRIBUTE_BOUNDARY_WIDTH).get().getIntegerValue()
-                    : 5;
-            pointRadius = attrSet.getAttr(ATTRIBUTE_POINT_RADIUS).isPresent()
-                    ? attrSet.getAttr(ATTRIBUTE_POINT_RADIUS).get().getIntegerValue()
-                    : 10;
-            enabledBorder = attrSet.getAttr(ATTRIBUTE_ENABLED_BORDER).isPresent()
-                    && attrSet.getAttr(ATTRIBUTE_ENABLED_BORDER).get().getBoolValue();
-            enabledAnimation = !attrSet.getAttr(ATTRIBUTE_ENABLED_ANIMATION).isPresent()
-                    || attrSet.getAttr(ATTRIBUTE_ENABLED_ANIMATION).get().getBoolValue();
-            enabledShowPoint = !attrSet.getAttr(ATTRIBUTE_ENABLED_SHOW_POINT).isPresent()
-                    || attrSet.getAttr(ATTRIBUTE_ENABLED_SHOW_POINT).get().getBoolValue();
-            enabledPolygon = !attrSet.getAttr(ATTRIBUTE_ENABLED_POLYGON).isPresent()
-                    || attrSet.getAttr(ATTRIBUTE_ENABLED_POLYGON).get().getBoolValue();
-            enabledShade = !attrSet.getAttr(ATTRIBUTE_ENABLED_SHADE).isPresent()
-                    || attrSet.getAttr(ATTRIBUTE_ENABLED_SHADE).get().getBoolValue();
-            enabledRadius = !attrSet.getAttr(ATTRIBUTE_ENABLED_RADIUS).isPresent()
-                    || attrSet.getAttr(ATTRIBUTE_ENABLED_RADIUS).get().getBoolValue();
-            enabledText = !attrSet.getAttr(ATTRIBUTE_ENABLED_TEXT).isPresent()
-                    || attrSet.getAttr(ATTRIBUTE_ENABLED_TEXT).get().getBoolValue();
-            animDuration = attrSet.getAttr(ATTRIBUTE_ANIMATION_DURATION).isPresent()
-                    ? attrSet.getAttr(ATTRIBUTE_ANIMATION_DURATION).get().getIntegerValue()
-                    : 1000;
 
+            attr = attrSet.getAttr(ATTRIBUTE_COUNT);
+            count = attr.map(Attr::getIntegerValue).orElse(6);
+
+            attr = attrSet.getAttr(ATTRIBUTE_LAYER_COUNT);
+            layerCount = attr.map(Attr::getIntegerValue).orElse(6);
+
+            attr = attrSet.getAttr(ATTRIBUTE_DRAWABLE_SIZE);
+            drawableSize = attr.map(Attr::getDimensionValue).orElse(40);
+
+            attr = attrSet.getAttr(ATTRIBUTE_DRAWABLE_PADDING);
+            drawablePadding = attr.map(Attr::getDimensionValue).orElse(10);
+
+            attr = attrSet.getAttr(ATTRIBUTE_DESC_PADDING);
+            descPadding = attr.map(Attr::getDimensionValue).orElse(5);
+
+            attr = attrSet.getAttr(ATTRIBUTE_TITLE_SIZE);
+            titleSize = attr.map(Attr::getDimensionValue).orElse(40);
+
+            attr = attrSet.getAttr(ATTRIBUTE_DATA_SIZE);
+            dataSize = attr.map(Attr::getDimensionValue).orElse(30);
+
+            attr = attrSet.getAttr(ATTRIBUTE_RADAR_PERCENT);
+            radarPercent = attr.map(Attr::getFloatValue).orElse(0.7f);
+
+            attr = attrSet.getAttr(ATTRIBUTE_START_COLOR);
+            startColor = attr.map(Attr::getColorValue).orElse(new Color(RgbPalette.parse("#80FFCC33")));
+
+            attr = attrSet.getAttr(ATTRIBUTE_END_COLOR);
+            endColor = attr.map(Attr::getColorValue).orElse(new Color(RgbPalette.parse("#80FFFFCC")));
+
+            attr = attrSet.getAttr(ATTRIBUTE_COBWEB_COLOR);
+            cobwebColor = attr.map(Attr::getColorValue).orElse(new Color(RgbPalette.parse("#80444444")));
+
+            attr = attrSet.getAttr(ATTRIBUTE_DATA_COLOR);
+            dataColor = attr.map(Attr::getColorValue).orElse(new Color(RgbPalette.parse("#00000000")));
+
+            attr = attrSet.getAttr(ATTRIBUTE_SINGLE_COLOR);
+            singleColor = attr.map(Attr::getColorValue).orElse(new Color(RgbPalette.parse("#80CC0000")));
+
+            attr = attrSet.getAttr(ATTRIBUTE_TITLE_COLOR);
+            titleColor = attr.map(Attr::getColorValue).orElse(new Color(RgbPalette.parse("#80000000")));
+
+            attr = attrSet.getAttr(ATTRIBUTE_POINT_COLOR);
+            pointColor = attr.map(Attr::getColorValue).orElse(new Color(RgbPalette.parse("#80333366")));
+
+            attr = attrSet.getAttr(ATTRIBUTE_BORDER_COLOR);
+            borderColor = attr.map(Attr::getColorValue).orElse(new Color(RgbPalette.parse("#80333366")));
+
+            attr = attrSet.getAttr(ATTRIBUTE_RADIUS_COLOR);
+            radiusColor = attr.map(Attr::getColorValue).orElse(new Color(RgbPalette.parse("#80CCCCCC")));
+
+            attr = attrSet.getAttr(ATTRIBUTE_BOUNDARY_WIDTH);
+            boundaryWidth = attr.map(Attr::getDimensionValue).orElse(5);
+
+            attr = attrSet.getAttr(ATTRIBUTE_POINT_RADIUS);
+            pointRadius = attr.map(Attr::getDimensionValue).orElse(10);
+
+            attr = attrSet.getAttr(ATTRIBUTE_ENABLED_BORDER);
+            enabledBorder = attr.map(Attr::getBoolValue).orElse(false);
+
+            attr = attrSet.getAttr(ATTRIBUTE_ENABLED_ANIMATION);
+            enabledAnimation = attr.map(Attr::getBoolValue).orElse(true);
+
+            attr = attrSet.getAttr(ATTRIBUTE_ENABLED_SHOW_POINT);
+            enabledShowPoint = attr.map(Attr::getBoolValue).orElse(true);
+
+            attr = attrSet.getAttr(ATTRIBUTE_ENABLED_POLYGON);
+            enabledPolygon = attr.map(Attr::getBoolValue).orElse(true);
+
+            attr = attrSet.getAttr(ATTRIBUTE_ENABLED_SHADE);
+            enabledShade = attr.map(Attr::getBoolValue).orElse(true);
+
+            attr = attrSet.getAttr(ATTRIBUTE_ENABLED_RADIUS);
+            enabledRadius = attr.map(Attr::getBoolValue).orElse(true);
+
+            attr = attrSet.getAttr(ATTRIBUTE_ENABLED_TEXT);
+            enabledText = attr.map(Attr::getBoolValue).orElse(true);
+
+            attr = attrSet.getAttr(ATTRIBUTE_ANIMATION_DURATION);
+            animDuration = attr.map(Attr::getIntegerValue).orElse(1000);
         }
 
         titleRects = new ArrayList<>();
@@ -344,7 +353,7 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
             int w = component.getWidth();
             int h = component.getHeight();
             radius = Math.min(h, w) / 2.0f * radarPercent;
-            maxTextWidth = (int) (Math.min(h, w) / 2 * (1 - radarPercent));
+            maxTextWidth = (int) (Math.min(h, w) / 2.0 * (1 - radarPercent));
             //The central coordinates
             centerX = w / 2;
             centerY = h / 2;
@@ -799,9 +808,9 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
             canvas.translate(x, y - layout.getHeight() / 2.0f);
             rect = new Rect(
                     (int) x,
-                    (int) (y - layout.getHeight() / 2),
+                    (int) (y - layout.getHeight() / 2.0),
                     (int) x + rectWidth,
-                    (int) (y - layout.getHeight() / 2) + layout.getHeight());
+                    (int) (y - layout.getHeight() / 2.0) + layout.getHeight());
         }
         titleRects.set(position, rect);
         layout.drawText(canvas);
