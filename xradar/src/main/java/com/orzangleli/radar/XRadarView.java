@@ -35,16 +35,14 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
     //attributes
     private static final String ATTRIBUTE_COUNT = "count";
     private static final String ATTRIBUTE_LAYER_COUNT = "layerCount";
-    private static final String ATTRIBUTE_DRAWABLE_SIZE = "mDrawableSize";
-    private static final String ATTRIBUTE_DRAWABLE_PADDING = "mDrawablePadding";
+    private static final String ATTRIBUTE_DRAWABLE_SIZE = "drawableSize";
+    private static final String ATTRIBUTE_DRAWABLE_PADDING = "drawablePadding";
     private static final String ATTRIBUTE_DESC_PADDING = "descPadding";
     private static final String ATTRIBUTE_TITLE_SIZE = "titleSize";
-    private static final String ATTRIBUTE_DATA_SIZE = "dataSize";
     private static final String ATTRIBUTE_RADAR_PERCENT = "radarPercent";
     private static final String ATTRIBUTE_START_COLOR = "startColor";
     private static final String ATTRIBUTE_END_COLOR = "endColor";
     private static final String ATTRIBUTE_COBWEB_COLOR = "cobwebColor";
-    private static final String ATTRIBUTE_DATA_COLOR = "dataColor";
     private static final String ATTRIBUTE_SINGLE_COLOR = "singleColor";
     private static final String ATTRIBUTE_TITLE_COLOR = "titleColor";
     private static final String ATTRIBUTE_POINT_COLOR = "pointColor";
@@ -68,7 +66,6 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
     private int drawablePadding = 10;
     private int descPadding = 5;
     private int titleSize = 40;
-    private int dataSize = 30;
 
     private float radarPercent = 0.7f;
 
@@ -76,8 +73,7 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
     private Color endColor = new Color(RgbPalette.parse("#8000FF00"));
     // The color of the cobweb line
     private Color cobwebColor;
-    // The text color of the data value
-    private Color dataColor;
+
     // If it is not a multicolored area, it is a single color
     private Color singleColor;
 
@@ -137,7 +133,7 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
     private Shader regionShader;
 
     private Paint cobwebPaint;
-    private Paint dataPaint;
+    private Paint multiRegionPaint;
     private Paint singlePaint;
     private Paint titlePaint;
     private Paint layerPaint;
@@ -202,9 +198,6 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
             attr = attrSet.getAttr(ATTRIBUTE_TITLE_SIZE);
             titleSize = attr.map(Attr::getDimensionValue).orElse(40);
 
-            attr = attrSet.getAttr(ATTRIBUTE_DATA_SIZE);
-            dataSize = attr.map(Attr::getDimensionValue).orElse(30);
-
             attr = attrSet.getAttr(ATTRIBUTE_RADAR_PERCENT);
             radarPercent = attr.map(Attr::getFloatValue).orElse(0.7f);
 
@@ -216,9 +209,6 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
 
             attr = attrSet.getAttr(ATTRIBUTE_COBWEB_COLOR);
             cobwebColor = attr.map(Attr::getColorValue).orElse(new Color(RgbPalette.parse("#80444444")));
-
-            attr = attrSet.getAttr(ATTRIBUTE_DATA_COLOR);
-            dataColor = attr.map(Attr::getColorValue).orElse(new Color(RgbPalette.parse("#00000000")));
 
             attr = attrSet.getAttr(ATTRIBUTE_SINGLE_COLOR);
             singleColor = attr.map(Attr::getColorValue).orElse(new Color(RgbPalette.parse("#80CC0000")));
@@ -278,10 +268,9 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
         cobwebPaint.setAntiAlias(true);
         cobwebPaint.setStyle(Paint.Style.STROKE_STYLE);
 
-        dataPaint = new Paint();
-        dataPaint.setColor(dataColor);
-        dataPaint.setAntiAlias(true);
-        dataPaint.setStyle(Paint.Style.FILLANDSTROKE_STYLE);
+        multiRegionPaint = new Paint();
+        multiRegionPaint.setAntiAlias(true);
+        multiRegionPaint.setStyle(Paint.Style.FILLANDSTROKE_STYLE);
 
         singlePaint = new Paint();
         singlePaint.setColor(singleColor);
@@ -740,8 +729,8 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
             path.lineTo(list.get(i + 1).getPointX(), list.get(i + 1).getPointY());
             path.lineTo(centerX, centerY);
             path.close();
-            dataPaint.setColor(new Color(colors[i % colorSize]));
-            canvas.drawPath(path, dataPaint);
+            multiRegionPaint.setColor(new Color(colors[i % colorSize]));
+            canvas.drawPath(path, multiRegionPaint);
         }
         path.reset();
         path.moveTo(centerX, centerY);
@@ -749,8 +738,8 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
         path.lineTo(list.get(0).getPointX(), list.get(0).getPointY());
         path.lineTo(centerX, centerY);
         path.close();
-        dataPaint.setColor(new Color(colors[(list.size() - 1) % colorSize]));
-        canvas.drawPath(path, dataPaint);
+        multiRegionPaint.setColor(new Color(colors[(list.size() - 1) % colorSize]));
+        canvas.drawPath(path, multiRegionPaint);
         canvas.restore();
     }
 
@@ -1053,25 +1042,6 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
     }
 
     /**
-     * Get Data(Percent value) text size.
-     *
-     * @return Data(Percent value) text size in int form.
-     */
-    public int getDataSize() {
-        return dataSize;
-    }
-
-    /**
-     * Set Data(Percent value) text size.
-     *
-     * @param dataSize Data(Percent value) text size.
-     */
-    public void setDataSize(int dataSize) {
-        this.dataSize = dataSize;
-        invalidate();
-    }
-
-    /**
      * Get radar percent.
      *
      * @return Radar percent in float form.
@@ -1185,26 +1155,6 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
     public void setCobwebColor(Color cobwebColor) {
         this.cobwebColor = cobwebColor;
         cobwebPaint.setColor(cobwebColor);
-        invalidate();
-    }
-
-    /**
-     * Get the Data(percent value) text color.
-     *
-     * @return Data(percent value) color in Color instance form.
-     */
-    public Color getDataColor() {
-        return dataColor;
-    }
-
-    /**
-     * Set the Data(percent value) text color.
-     *
-     * @param dataColor The Data(percent value) text color.
-     */
-    public void setDataColor(Color dataColor) {
-        this.dataColor = dataColor;
-        dataPaint.setColor(dataColor);
         invalidate();
     }
 

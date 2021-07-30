@@ -21,6 +21,7 @@ dependencies {
     testImplementation 'junit:junit:4.13'
     ohosTestImplementation 'com.huawei.ohos.testkit:runner:1.0.0.100'
 
+   // implementation 'dev.applibgroup:xradar:1.0.0'
     implementation project(':xradar')
 }
 decc {
