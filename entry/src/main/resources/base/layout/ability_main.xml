@@ -432,28 +432,6 @@
 
             <Text
                 ohos:width="match_parent"
-                ohos:height="match_content"
-                ohos:top_margin="10vp"
-                ohos:text_size="14fp"
-                ohos:text_alignment="left|vertical_center"
-                ohos:left_padding="20vp"
-                ohos:text="$string:lable_rich_text_title" />
-
-            <ToggleButton
-                ohos:id="$+id:drawRichText"
-                ohos:width="match_content"
-                ohos:height="match_content"
-                ohos:layout_alignment="center"
-                ohos:left_padding="16vp"
-                ohos:right_padding="16vp"
-                ohos:top_padding="8vp"
-                ohos:bottom_padding="8vp"
-                ohos:text_size="14fp"
-                ohos:background_element="#ccc"
-                />
-
-            <Text
-                ohos:width="match_parent"
                 ohos:height="40vp"
                 ohos:top_margin="20vp"
                 ohos:text_size="14fp"

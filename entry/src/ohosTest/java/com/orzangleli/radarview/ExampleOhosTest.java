@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2020-21 Application Library Engineering Group
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -117,12 +117,6 @@ public class ExampleOhosTest {
     }
 
     @Test
-    public void testDataSize() {
-        xRadarView.setDataSize(20);
-        assertEquals(20, xRadarView.getDataSize());
-    }
-
-    @Test
     public void testRadarPercent() {
         xRadarView.setRadarPercent(5f);
         assertEquals(5f, xRadarView.getRadarPercent(), 0.0f);
@@ -150,12 +144,6 @@ public class ExampleOhosTest {
     public void testEnabledShowPoint() {
         xRadarView.setEnabledShowPoint(false);
         assertFalse(xRadarView.isEnabledShowPoint());
-    }
-
-    @Test
-    public void testDataColor() {
-        xRadarView.setDataColor(Color.YELLOW);
-        assertEquals(Color.YELLOW, xRadarView.getDataColor());
     }
 
     @Test

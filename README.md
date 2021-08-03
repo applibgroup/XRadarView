@@ -6,18 +6,16 @@ XRadarView supports a high degree of customization, and its adjustable attribute
 
 |Attributes  | meaning |
 |:-------------:|:-------------:|
-|count|Polygonal radar|
+|count|Polygonal edge count|
 |layerCount|Several layers of spider webs|
 |drawableSize|Icon size|
 |drawablePadding|Icon and text spacing|
 |descPadding|Title description and distance between nodes|
 |titleSize|Title text size|
-|dataSize|The text size of the value below the title|
 |radarPercent|The ratio of the radar chart graphic to the entire space|
 |startColor|When the gradient is turned on, the color at the center of the circle|
 |endColor|When the gradient is turned on, the color at the outer circle|
 |cobwebColor|The color of the regular polygonal network cable|
-|dataColor|Color of numeric text|
 |singleColor|If it is not a multi-color area, it is a single color|
 |titleColor|The color of the title text|
 |pointColor|Dot color|
@@ -134,6 +132,9 @@ XRadarView supports a high degree of customization, and its adjustable attribute
         // A single color without gradient colors
         radarView.setSingleColor(new Color(RgbPalette.parse("#800000ff")));
         
+## Future Work
+1. Adding RichClientText support.
+2. Customize data value style.
 
 ## License
 MIT License

@@ -60,7 +60,6 @@ public class MainAbilitySlice extends AbilitySlice implements AbsButton.CheckedS
     ToggleButton drawRadius;
     ToggleButton drawText;
     ToggleButton drawIcon;
-    ToggleButton drawRichText;
     Button loadAnimation;
 
     //icon array
@@ -113,7 +112,6 @@ public class MainAbilitySlice extends AbilitySlice implements AbsButton.CheckedS
         drawRadius.setCheckedStateChangedListener(this);
         drawText.setCheckedStateChangedListener(this);
         drawIcon.setCheckedStateChangedListener(this);
-        drawRichText.setCheckedStateChangedListener(this);
 
         loadAnimation.setClickedListener(component -> radarView.loadAnimation(true));
 
@@ -146,7 +144,6 @@ public class MainAbilitySlice extends AbilitySlice implements AbsButton.CheckedS
         drawRadius = (ToggleButton) this.findComponentById(ResourceTable.Id_drawRadius);
         drawText = (ToggleButton) this.findComponentById(ResourceTable.Id_drawText);
         drawIcon = (ToggleButton) this.findComponentById(ResourceTable.Id_drawIcon);
-        drawRichText = (ToggleButton) this.findComponentById(ResourceTable.Id_drawRichText);
         jump = (Text) this.findComponentById(ResourceTable.Id_jump);
         radarView = (XRadarView) this.findComponentById(ResourceTable.Id_radarView);
     }
@@ -336,10 +333,6 @@ public class MainAbilitySlice extends AbilitySlice implements AbsButton.CheckedS
                 } else {
                     radarView.setDrawables(null);
                 }
-                break;
-            case ResourceTable.Id_drawRichText:
-                titles[0] = "kill";
-                radarView.setTitles(titles);
                 break;
             default:{
                 //Do nothing
