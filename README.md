@@ -36,7 +36,7 @@ XRadarView supports a high degree of customization, and its adjustable attribute
 |values|Text array of values|
 |colors|In the case of multi-color areas, the color array of each area (the length of the array can be less than count)|
 |enabledRegionShader|Whether to allow regional color gradients|
-|isCircle|Whether the area outline is circular|
+|enabledCircularOutline|Whether the area outline is circular|
 
 ## Screenshots
 ![](https://github.com/applibgroup/XRadarView/blob/master/screenshot/Screenshot%20(1).png)

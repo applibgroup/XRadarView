@@ -196,8 +196,8 @@ public class ExampleOhosTest {
 
     @Test
     public void testCircle() {
-        xRadarView.setCircle(false);
-        assertFalse(xRadarView.isCircle());
+        xRadarView.setEnabledCircularOutline(false);
+        assertFalse(xRadarView.isEnabledCircularOutline());
     }
 
     @Test

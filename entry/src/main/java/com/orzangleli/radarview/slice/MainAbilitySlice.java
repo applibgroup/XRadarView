@@ -113,7 +113,16 @@ public class MainAbilitySlice extends AbilitySlice implements AbsButton.CheckedS
         drawText.setCheckedStateChangedListener(this);
         drawIcon.setCheckedStateChangedListener(this);
 
-        loadAnimation.setClickedListener(component -> radarView.loadAnimation(true));
+        loadAnimation.setClickedListener(component -> {
+            if (radarView.isEnabledAnimation()) {
+                radarView.loadAnimation(true);
+            } else {
+                new ToastDialog(getContext())
+                        .setText("Please enable animation first!")
+                        .setDuration(2000)
+                        .show();
+            }
+        });
 
         drawBorder.setChecked(true);
         drawPoint.setChecked(true);
@@ -319,7 +328,7 @@ public class MainAbilitySlice extends AbilitySlice implements AbsButton.CheckedS
                 radarView.setEnabledRegionShader(isChecked);
                 break;
             case ResourceTable.Id_regionCircle:
-                radarView.setCircle(isChecked);
+                radarView.setEnabledCircularOutline(isChecked);
                 break;
             case ResourceTable.Id_drawRadius:
                 radarView.setEnabledRadius(isChecked);

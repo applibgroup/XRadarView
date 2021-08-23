@@ -32,45 +32,35 @@ import org.jetbrains.annotations.Nullable;
  */
 public class XRadarView extends Component implements Component.DrawTask, Component.TouchEventListener {
 
-    //attributes
-    private static final String ATTRIBUTE_COUNT = "count";
-    private static final String ATTRIBUTE_LAYER_COUNT = "layerCount";
-    private static final String ATTRIBUTE_DRAWABLE_SIZE = "drawableSize";
-    private static final String ATTRIBUTE_DRAWABLE_PADDING = "drawablePadding";
-    private static final String ATTRIBUTE_DESC_PADDING = "descPadding";
-    private static final String ATTRIBUTE_TITLE_SIZE = "titleSize";
-    private static final String ATTRIBUTE_RADAR_PERCENT = "radarPercent";
-    private static final String ATTRIBUTE_START_COLOR = "startColor";
-    private static final String ATTRIBUTE_END_COLOR = "endColor";
-    private static final String ATTRIBUTE_COBWEB_COLOR = "cobwebColor";
-    private static final String ATTRIBUTE_SINGLE_COLOR = "singleColor";
-    private static final String ATTRIBUTE_TITLE_COLOR = "titleColor";
-    private static final String ATTRIBUTE_POINT_COLOR = "pointColor";
-    private static final String ATTRIBUTE_BORDER_COLOR = "borderColor";
-    private static final String ATTRIBUTE_RADIUS_COLOR = "radiusColor";
-    private static final String ATTRIBUTE_BOUNDARY_WIDTH = "boundaryWidth";
-    private static final String ATTRIBUTE_POINT_RADIUS = "pointRadius";
-    private static final String ATTRIBUTE_ENABLED_BORDER = "enabledBorder";
-    private static final String ATTRIBUTE_ENABLED_ANIMATION = "enabledAnimation";
-    private static final String ATTRIBUTE_ENABLED_SHOW_POINT = "enabledShowPoint";
-    private static final String ATTRIBUTE_ENABLED_POLYGON = "enabledPolygon";
-    private static final String ATTRIBUTE_ENABLED_SHADE = "enabledShade";
-    private static final String ATTRIBUTE_ENABLED_RADIUS = "enabledRadius";
-    private static final String ATTRIBUTE_ENABLED_TEXT = "enabledText";
-    private static final String ATTRIBUTE_ANIMATION_DURATION = "animDuration";
+    /* -------------------- ATTRIBUTE MEMBERS -------------------- */
 
     // Several-sided radar
     private int count = 5;
-    private int layerCount = 6;  // Number of layer
+
+    // Number of layer
+    private int layerCount = 6;
+
+    // Size of icons
     private int drawableSize = 40;
+
+    // Icon and text spacing
     private int drawablePadding = 10;
+
+    // Title and node spacing
     private int descPadding = 5;
+
+    // Title size
     private int titleSize = 40;
 
+    // The ratio of the radar chart graphic to the entire space
     private float radarPercent = 0.7f;
 
+    // When the gradient is turned on, the color at the center of the circle
     private Color startColor = new Color(RgbPalette.parse("#80FF0000"));
+
+    // When the gradient is turned on, the color at the outer circle
     private Color endColor = new Color(RgbPalette.parse("#8000FF00"));
+
     // The color of the cobweb line
     private Color cobwebColor;
 
@@ -79,40 +69,56 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
 
     // The color of the title text
     private Color titleColor;
+
     // Dot color
     private Color pointColor;
-    // The size of the dot radius
-    private int pointRadius;
+
     // The color of the boundary line
     private Color borderColor;
-    // The width of the boundary line
-    private int boundaryWidth;
+
     // The color of the radius line
     private Color radiusColor;
-    // Radar chart gradient color array
-    private Color[] shaderColors;
-    // The location of various color distributions of radar map gradient colors
-    private float[] shaderPositions;
 
+    // The width of the boundary line
+    private int boundaryWidth;
+
+    // The size of the dot radius
+    private int pointRadius;
 
     // Whether to draw a boundary line
     private boolean enabledBorder = false;
+
     // Whether to turn on the animation
     private boolean enabledAnimation = true;
-    // The duration of the animation
-    private int animDuration = 1000;
+
     // Whether the dot is displayed
     private boolean enabledShowPoint = true;
+
     // Whether to draw the grid
     private boolean enabledPolygon = true;
+
     // Whether to draw a gradient ring
     private boolean enabledShade = true;
+
     // Whether to draw the radius
     private boolean enabledRadius = true;
+
     // Whether to draw the text
     private boolean enabledText = true;
-    // Whether to paint the radar area as a gradient color
-    private boolean enabledRegionShader = false;
+
+    // Whether the outer outline is circular
+    private boolean enabledCircularOutline = false;
+
+    // The duration of the animation
+    private int animDuration = 1000;
+
+    /* -------------------- REQUIRED FIELDS -------------------- */
+
+    // Radar chart gradient color array
+    private Color[] shaderColors;
+
+    // The location of various color distributions of radar map gradient colors
+    private float[] shaderPositions;
 
     // Text maximum allowable width
     private int maxTextWidth;
@@ -126,12 +132,30 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
     // radius
     private float radius;
 
-    // Whether the outer outline is circular
-    private boolean isCircle = false;
-
     // Area gradient shader
     private Shader regionShader;
 
+    // Whether to paint the radar area as a gradient color
+    private boolean enabledRegionShader = false;
+
+    // The current scale ratio
+    private float currentScale;
+
+    private List<Rect> titleRects;
+
+    // array of icons
+    private int[] drawables;
+    // array of titles
+    CharSequence[] titles;
+    // Value for each property (0 to 1.0)
+    double[] percents;
+    // Numeric text below each title
+    CharSequence[] values;
+    // array of multi-region area color
+    int[] colors;
+
+
+    /* -------------------- PAINT & DRAW -------------------- */
     private Paint cobwebPaint;
     private Paint multiRegionPaint;
     private Paint singlePaint;
@@ -141,33 +165,15 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
     private Paint radiusPaint;
     private Paint borderPaint;
 
-
-    // The current scale ratio
-    private float currentScale;
-
-    private List<Rect> titleRects;
-
-    // icon
-    private int[] drawables;
-    // title
-    CharSequence[] titles;
-    // Value for each property (0 to 1.0)
-    double[] percents;
-    // Numeric text below each title
-    CharSequence[] values;
-    // The area color
-    int[] colors;
-
+    /* -------------------- Interfaces -------------------- */
     OnTitleClickListener onTitleClickListener;
 
     public XRadarView(Context context) {
-        this(context, null, 0);
-        init(null);
+        this(context, null);
     }
 
     public XRadarView(Context context, @Nullable AttrSet attrs) {
         this(context, attrs, 0);
-        init(attrs);
     }
 
     public XRadarView(Context context, @Nullable AttrSet attrs, int defStyleAttr) {
@@ -180,79 +186,82 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
         Optional<Attr> attr;
         if (attrSet != null) {
 
-            attr = attrSet.getAttr(ATTRIBUTE_COUNT);
+            attr = attrSet.getAttr(Attribute.COUNT);
             count = attr.map(Attr::getIntegerValue).orElse(6);
 
-            attr = attrSet.getAttr(ATTRIBUTE_LAYER_COUNT);
+            attr = attrSet.getAttr(Attribute.LAYER_COUNT);
             layerCount = attr.map(Attr::getIntegerValue).orElse(6);
 
-            attr = attrSet.getAttr(ATTRIBUTE_DRAWABLE_SIZE);
+            attr = attrSet.getAttr(Attribute.DRAWABLE_SIZE);
             drawableSize = attr.map(Attr::getDimensionValue).orElse(40);
 
-            attr = attrSet.getAttr(ATTRIBUTE_DRAWABLE_PADDING);
+            attr = attrSet.getAttr(Attribute.DRAWABLE_PADDING);
             drawablePadding = attr.map(Attr::getDimensionValue).orElse(10);
 
-            attr = attrSet.getAttr(ATTRIBUTE_DESC_PADDING);
+            attr = attrSet.getAttr(Attribute.DESC_PADDING);
             descPadding = attr.map(Attr::getDimensionValue).orElse(5);
 
-            attr = attrSet.getAttr(ATTRIBUTE_TITLE_SIZE);
+            attr = attrSet.getAttr(Attribute.TITLE_SIZE);
             titleSize = attr.map(Attr::getDimensionValue).orElse(40);
 
-            attr = attrSet.getAttr(ATTRIBUTE_RADAR_PERCENT);
+            attr = attrSet.getAttr(Attribute.RADAR_PERCENT);
             radarPercent = attr.map(Attr::getFloatValue).orElse(0.7f);
 
-            attr = attrSet.getAttr(ATTRIBUTE_START_COLOR);
+            attr = attrSet.getAttr(Attribute.START_COLOR);
             startColor = attr.map(Attr::getColorValue).orElse(new Color(RgbPalette.parse("#80FFCC33")));
 
-            attr = attrSet.getAttr(ATTRIBUTE_END_COLOR);
+            attr = attrSet.getAttr(Attribute.END_COLOR);
             endColor = attr.map(Attr::getColorValue).orElse(new Color(RgbPalette.parse("#80FFFFCC")));
 
-            attr = attrSet.getAttr(ATTRIBUTE_COBWEB_COLOR);
+            attr = attrSet.getAttr(Attribute.COBWEB_COLOR);
             cobwebColor = attr.map(Attr::getColorValue).orElse(new Color(RgbPalette.parse("#80444444")));
 
-            attr = attrSet.getAttr(ATTRIBUTE_SINGLE_COLOR);
+            attr = attrSet.getAttr(Attribute.SINGLE_COLOR);
             singleColor = attr.map(Attr::getColorValue).orElse(new Color(RgbPalette.parse("#80CC0000")));
 
-            attr = attrSet.getAttr(ATTRIBUTE_TITLE_COLOR);
+            attr = attrSet.getAttr(Attribute.TITLE_COLOR);
             titleColor = attr.map(Attr::getColorValue).orElse(new Color(RgbPalette.parse("#80000000")));
 
-            attr = attrSet.getAttr(ATTRIBUTE_POINT_COLOR);
+            attr = attrSet.getAttr(Attribute.POINT_COLOR);
             pointColor = attr.map(Attr::getColorValue).orElse(new Color(RgbPalette.parse("#80333366")));
 
-            attr = attrSet.getAttr(ATTRIBUTE_BORDER_COLOR);
+            attr = attrSet.getAttr(Attribute.BORDER_COLOR);
             borderColor = attr.map(Attr::getColorValue).orElse(new Color(RgbPalette.parse("#80333366")));
 
-            attr = attrSet.getAttr(ATTRIBUTE_RADIUS_COLOR);
+            attr = attrSet.getAttr(Attribute.RADIUS_COLOR);
             radiusColor = attr.map(Attr::getColorValue).orElse(new Color(RgbPalette.parse("#80CCCCCC")));
 
-            attr = attrSet.getAttr(ATTRIBUTE_BOUNDARY_WIDTH);
+            attr = attrSet.getAttr(Attribute.BOUNDARY_WIDTH);
             boundaryWidth = attr.map(Attr::getDimensionValue).orElse(5);
 
-            attr = attrSet.getAttr(ATTRIBUTE_POINT_RADIUS);
+            attr = attrSet.getAttr(Attribute.POINT_RADIUS);
             pointRadius = attr.map(Attr::getDimensionValue).orElse(10);
 
-            attr = attrSet.getAttr(ATTRIBUTE_ENABLED_BORDER);
+            attr = attrSet.getAttr(Attribute.ENABLED_BORDER);
             enabledBorder = attr.map(Attr::getBoolValue).orElse(false);
 
-            attr = attrSet.getAttr(ATTRIBUTE_ENABLED_ANIMATION);
+            attr = attrSet.getAttr(Attribute.ENABLED_ANIMATION);
             enabledAnimation = attr.map(Attr::getBoolValue).orElse(true);
 
-            attr = attrSet.getAttr(ATTRIBUTE_ENABLED_SHOW_POINT);
+            attr = attrSet.getAttr(Attribute.ENABLED_SHOW_POINT);
             enabledShowPoint = attr.map(Attr::getBoolValue).orElse(true);
 
-            attr = attrSet.getAttr(ATTRIBUTE_ENABLED_POLYGON);
+            attr = attrSet.getAttr(Attribute.ENABLED_POLYGON);
             enabledPolygon = attr.map(Attr::getBoolValue).orElse(true);
 
-            attr = attrSet.getAttr(ATTRIBUTE_ENABLED_SHADE);
+            attr = attrSet.getAttr(Attribute.ENABLED_SHADE);
             enabledShade = attr.map(Attr::getBoolValue).orElse(true);
 
-            attr = attrSet.getAttr(ATTRIBUTE_ENABLED_RADIUS);
+            attr = attrSet.getAttr(Attribute.ENABLED_RADIUS);
             enabledRadius = attr.map(Attr::getBoolValue).orElse(true);
 
-            attr = attrSet.getAttr(ATTRIBUTE_ENABLED_TEXT);
+            attr = attrSet.getAttr(Attribute.ENABLED_TEXT);
             enabledText = attr.map(Attr::getBoolValue).orElse(true);
 
-            attr = attrSet.getAttr(ATTRIBUTE_ANIMATION_DURATION);
+            attr = attrSet.getAttr(Attribute.ENABLED_CIRCULAR_OUTLINE);
+            enabledCircularOutline = attr.map(Attr::getBoolValue).orElse(false);
+
+            attr = attrSet.getAttr(Attribute.ANIMATION_DURATION);
             animDuration = attr.map(Attr::getIntegerValue).orElse(1000);
         }
 
@@ -460,7 +469,7 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
         for (int i = layerCount; i >= 1; i--) {
             float curR = r * i;
             path.reset();
-            if (isCircle) {
+            if (enabledCircularOutline) {
                 path.addCircle(centerX, centerY, curR, Path.Direction.CLOCK_WISE);
             } else {
                 for (int j = 0; j < count; j++) {
@@ -493,7 +502,7 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
             float curR = r * i;
             path = new Path();
             for (int j = 0; j < count; j++) {
-                if (isCircle) {
+                if (enabledCircularOutline) {
                     path.addCircle(centerX, centerY, curR, Path.Direction.CLOCK_WISE);
                 } else {
                     if (j == 0) {
@@ -1300,18 +1309,18 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
      *
      * @return true if the status of area outline is circular.
      */
-    public boolean isCircle() {
-        return isCircle;
+    public boolean isEnabledCircularOutline() {
+        return enabledCircularOutline;
     }
 
     /**
      * Sets whether area outline is circular or not.
      * It will reset the view if the status has changed.
      *
-     * @param circle true if area outline is circular.
+     * @param enabledCircularOutline true if area outline is circular.
      */
-    public void setCircle(boolean circle) {
-        isCircle = circle;
+    public void setEnabledCircularOutline(boolean enabledCircularOutline) {
+        this.enabledCircularOutline = enabledCircularOutline;
         invalidate();
     }
 
