@@ -40,8 +40,8 @@ XRadarView supports a high degree of customization, and its adjustable attribute
 ## Screenshots
 ![](https://github.com/applibgroup/XRadarView/blob/master/screenshot/Screenshot%20(1).png)
 ![](https://github.com/applibgroup/XRadarView/blob/master/screenshot/Screenshot%20(2).png)
-![](https://github.com/applibgroup/XRadarView/blob/master/screenshot/Screenshot%20(3).png)
 ![](https://github.com/applibgroup/XRadarView/blob/master/screenshot/Screenshot%20(4).png)
+![](https://github.com/Click2cloud-Eros/XRadarView-1/blob/main/screenshot/Screenshot%20(3).png)
 
 ## How to use
 
