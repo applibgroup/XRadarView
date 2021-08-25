@@ -48,5 +48,6 @@ public class Attribute {
     public static final String ENABLED_RADIUS = "enabledRadius";
     public static final String ENABLED_TEXT = "enabledText";
     public static final String ENABLED_CIRCULAR_OUTLINE = "enabledCircularOutline";
+    public static final String ENABLED_MULTI_COLOR_REGION = "enabledMultiColorRegion";
     public static final String ANIMATION_DURATION = "animDuration";
 }

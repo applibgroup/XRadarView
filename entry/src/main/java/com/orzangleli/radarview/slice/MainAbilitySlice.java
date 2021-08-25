@@ -17,20 +17,26 @@
 
 package com.orzangleli.radarview.slice;
 
-import com.orzangleli.radar.XRadarView;
-import com.orzangleli.radarview.ResourceTable;
+import static ohos.agp.components.ComponentContainer.LayoutConfig.MATCH_CONTENT;
 import ohos.aafwk.ability.AbilitySlice;
 import ohos.aafwk.content.Intent;
 import ohos.agp.colors.RgbPalette;
 import ohos.agp.components.AbsButton;
 import ohos.agp.components.Button;
+import ohos.agp.components.DirectionalLayout;
+import ohos.agp.components.LayoutScatter;
 import ohos.agp.components.Slider;
 import ohos.agp.components.Text;
 import ohos.agp.components.ToggleButton;
 import ohos.agp.utils.Color;
+import ohos.agp.utils.LayoutAlignment;
 import ohos.agp.window.dialog.ToastDialog;
 import ohos.hiviewdfx.HiLog;
 import ohos.hiviewdfx.HiLogLabel;
+import com.orzangleli.radar.Node;
+import com.orzangleli.radar.XRadarView;
+import com.orzangleli.radarview.ResourceTable;
+import java.util.ArrayList;
 
 /**
  * Main ability slice to test all the functionality of XRadarView library.
@@ -62,38 +68,6 @@ public class MainAbilitySlice extends AbilitySlice implements AbsButton.CheckedS
     ToggleButton drawIcon;
     Button loadAnimation;
 
-    //icon array
-    final int[] drawables = new int[]{
-        ResourceTable.Media_icon,
-        ResourceTable.Media_icon,
-        ResourceTable.Media_icon,
-        ResourceTable.Media_icon,
-        ResourceTable.Media_icon,
-        ResourceTable.Media_icon,
-        ResourceTable.Media_icon};
-
-    // title
-    final CharSequence[] titles = new CharSequence[]{
-        "Kill",
-        "Money",
-        "Survival",
-        "Defense",
-        "Rubik's Cube",
-        "Physics",
-        "Assists",
-        "wisdom"};
-
-    // Value for each property (0 to 1.0)
-    final double[] percents = new double[]{0.8, 0.8, 0.9, 1, 0.6, 0.5, 0.77, 0.9};
-
-    // Numeric text below each title
-    final CharSequence[] values = new CharSequence[]{"80", "80%", "0.9", "100%", "3/5", "0.5", "0.77个", "1~12"};
-
-    // An array of colors when distinguishing adjacent areas with different colors (optional)
-    final int[] colors = new int[]{RgbPalette.parse("#A0ffcc00"), RgbPalette.parse("#A000ff00"),
-            RgbPalette.parse("#A00000ff"), RgbPalette.parse("#A0FF00FF"), RgbPalette.parse("#A000FFFF"),
-            RgbPalette.parse("#A0FFFF00"), RgbPalette.parse("#A000FF00"), RgbPalette.parse("#A0FF00FF")};
-
     @Override
     public void onStart(Intent intent) {
         super.onStart(intent);
@@ -124,13 +98,13 @@ public class MainAbilitySlice extends AbilitySlice implements AbsButton.CheckedS
             }
         });
 
-        drawBorder.setChecked(true);
-        drawPoint.setChecked(true);
-        drawIcon.setChecked(true);
-        drawText.setChecked(true);
-        drawRadius.setChecked(true);
-        drawPolygon.setChecked(true);
-        drawShade.setChecked(true);
+        drawBorder.setChecked(radarView.isEnabledBorder());
+        drawPoint.setChecked(radarView.isEnabledShowPoint());
+        drawIcon.setChecked(radarView.isEnableIcons());
+        drawText.setChecked(radarView.isEnabledText());
+        drawRadius.setChecked(radarView.isEnabledRadius());
+        drawPolygon.setChecked(radarView.isEnabledPolygon());
+        drawShade.setChecked(radarView.isEnabledShade());
     }
 
     private void initComponents() {
@@ -158,20 +132,10 @@ public class MainAbilitySlice extends AbilitySlice implements AbsButton.CheckedS
     }
 
     private void configRadarView() {
-        // The scale of values in the radar chart
-        radarView.setPercents(percents);
-        // Sets an array of colors for each area
-        // If colors are set, each area will display a different color,
-        // otherwise all areas will display the same color Action 1
-        radarView.setColors(null);
-        // Set each title
-        radarView.setTitles(titles);
-        // Set title color
-        radarView.setTitleColor(Color.RED);
-        // Set the text of the values displayed by each item
-        radarView.setValues(values);
-        // Set the icon for each item
-        radarView.setDrawables(drawables);
+
+        // Set node list with all the node details.
+        radarView.setNodeList(getNodeList());
+
         // Set the drawable padding for each item
         radarView.setDrawablePadding(20);
         // The setting allows connections between points
@@ -201,10 +165,9 @@ public class MainAbilitySlice extends AbilitySlice implements AbsButton.CheckedS
 
         // Radar image title and icon click event
         radarView.setOnTitleClickListener((view, position, x, y, rect) -> {
-            new ToastDialog(getContext())
-                    .setText("position = " + position)
-                    .setDuration(2000)
-                    .show();
+
+            showToastDialog("position = " + position);
+
             HiLog.debug(LABEL_LOG, "lxc", "position ----> " + position);
             HiLog.debug(LABEL_LOG, "lxc", "x ----> " + x);
             HiLog.debug(LABEL_LOG, "lxc", "y ----> " + y);
@@ -312,17 +275,12 @@ public class MainAbilitySlice extends AbilitySlice implements AbsButton.CheckedS
                 radarView.setEnabledShade(isChecked);
                 break;
             case ResourceTable.Id_drawMultiColor:
-                if (isChecked) {
-                    radarView.setColors(colors);
-                } else {
-                    radarView.setColors(null);
-                }
+                radarView.setEnabledMultiColorRegion(isChecked);
                 break;
             case ResourceTable.Id_regionSupportShader:
-                if (isChecked && radarView.getColors() != null) {
-                    new ToastDialog(this)
-                            .setText("turn on the area color gradient, you need to turn off the multi-color distinguished area first")
-                            .show();
+                if (isChecked && radarView.isEnabledMultiColorRegion()) {
+                    showToastDialog(getString(ResourceTable.String_msg_turn_off_multi_color));
+                    regionSupportShader.setChecked(false);
                     return;
                 }
                 radarView.setEnabledRegionShader(isChecked);
@@ -337,15 +295,43 @@ public class MainAbilitySlice extends AbilitySlice implements AbsButton.CheckedS
                 radarView.setEnabledText(isChecked);
                 break;
             case ResourceTable.Id_drawIcon:
-                if (isChecked) {
-                    radarView.setDrawables(drawables);
-                } else {
-                    radarView.setDrawables(null);
-                }
+                radarView.setEnableIcons(isChecked);
                 break;
-            default:{
+            default: {
                 //Do nothing
             }
         }
+    }
+
+    /**
+     * Create dummy node list.
+     * @return Array list of node.
+     */
+    private ArrayList<Node> getNodeList() {
+        ArrayList<Node> nodeList = new ArrayList<>();
+
+        nodeList.add(new Node("Kill", "80", 0.8, ResourceTable.Media_icon, RgbPalette.parse("#A0ffcc00")));
+        nodeList.add(new Node("Money", "80%", 0.8, ResourceTable.Media_icon, RgbPalette.parse("#A000ff00")));
+        nodeList.add(new Node("Survival", "0.9", 0.9, ResourceTable.Media_icon, RgbPalette.parse("#A00000ff")));
+        nodeList.add(new Node("Defense", "100%", 1, ResourceTable.Media_icon, RgbPalette.parse("#A0FF00FF")));
+        nodeList.add(new Node("Rubik's Cube", "3/5", 0.6, ResourceTable.Media_icon, RgbPalette.parse("#A000FFFF")));
+        nodeList.add(new Node("Physics", "50%", 0.5, ResourceTable.Media_icon, RgbPalette.parse("#A0FFFF00")));
+        nodeList.add(new Node("Assists", "0.77个", 0.77, ResourceTable.Media_icon, RgbPalette.parse("#A000FF00")));
+
+        return nodeList;
+    }
+
+    private void showToastDialog(String msg) {
+        DirectionalLayout toastLayout = (DirectionalLayout) LayoutScatter.getInstance(this)
+                .parse(ResourceTable.Layout_layout_toast, null, false);
+
+        Text txtMessage = (Text) toastLayout.findComponentById(ResourceTable.Id_msg_toast);
+        txtMessage.setText(msg);
+
+        new ToastDialog(MainAbilitySlice.this)
+                .setContentCustomComponent(toastLayout)
+                .setAlignment(LayoutAlignment.CENTER)
+                .setSize(MATCH_CONTENT, MATCH_CONTENT)
+                .show();
     }
 }

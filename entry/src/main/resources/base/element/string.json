@@ -93,6 +93,10 @@
       "value": "Load  Animation"
     },
     {
+      "name": "msg_turn_off_multi_color",
+      "value": "you need to turn off the multi-color distinguished area first"
+    },
+    {
       "name": "txt_val_50",
       "value": "50"
     },

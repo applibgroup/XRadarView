@@ -8,10 +8,10 @@ XRadarView supports a high degree of customization, and its adjustable attribute
 |:-------------:|:-------------:|
 |count|Polygonal edge count|
 |layerCount|Several layers of spider webs|
-|drawableSize|Icon size|
+|drawableSize|Icon size (Recommended size should be between 8vp - 26vp)|
 |drawablePadding|Icon and text spacing|
 |descPadding|Title description and distance between nodes|
-|titleSize|Title text size|
+|titleSize|Title text size (Recommended size should be between 10fp - 20fp)|
 |radarPercent|The ratio of the radar chart graphic to the entire space|
 |startColor|When the gradient is turned on, the color at the center of the circle|
 |endColor|When the gradient is turned on, the color at the outer circle|
@@ -19,10 +19,10 @@ XRadarView supports a high degree of customization, and its adjustable attribute
 |singleColor|If it is not a multi-color area, it is a single color|
 |titleColor|The color of the title text|
 |pointColor|Dot color|
-|pointRadius|Dot radius size|
 |borderColor|Border color|
-|boundaryWidth|The width of the border line|
 |radiusColor|The color of the radius line|
+|boundaryWidth|The width of the border line|
+|pointRadius|Dot radius size|
 |enabledBorder|Whether to draw a boundary line|
 |enabledAnimation|Whether to turn on animation|
 |enabledShowPoint|Whether to show dots|
@@ -30,13 +30,12 @@ XRadarView supports a high degree of customization, and its adjustable attribute
 |enabledShade|Whether to draw a gradient ring|
 |enabledRadius|Whether to draw radius|
 |enabledText|Whether to draw text|
-|drawables|An array of icons|
-|titles|Title array|
-|percents|The value array of each item (converted to a value between 0-1)|
-|values|Text array of values|
-|colors|In the case of multi-color areas, the color array of each area (the length of the array can be less than count)|
-|enabledRegionShader|Whether to allow regional color gradients|
 |enabledCircularOutline|Whether the area outline is circular|
+|enabledMultiColorRegion|Whether the region is draw with multi-color|
+|enabledRegionShader|Whether to allow regional color gradients|
+|nodeList|Node is a model class which include all the details of single node (i.e. title, value, percent, iconRef, colorValue). As per your requirement you can add element in node list, but the size of node list must be greater than or equal to count value. And You can set node list only from java file using setNodeList(List<Node> nodeList).|
+
+
 
 ## Screenshots
 ![](https://github.com/applibgroup/XRadarView/blob/master/screenshot/Screenshot%20(1).png)
@@ -77,7 +76,7 @@ XRadarView supports a high degree of customization, and its adjustable attribute
         ohos:id="$+id:radarView"
         ohos:height="match_parent"
         ohos:width="match_parent"
-        ohos:count="7"
+        ohos:count="7" //Value must be less than or equal to nodelist size.
         ohos:layerCount="4"
         ohos:enabledBorder="true"
         ohos:borderColor="#ff0000"
@@ -94,19 +93,8 @@ XRadarView supports a high degree of customization, and its adjustable attribute
 
     XRadarView radarView = (XRadarView) this.findComponentById(ResourceTable.Id_radarView);
     
-        // The scale of values in the radar chart
-        radarView.setPercents(percents);
-        // Sets an array of colors for each area
-        // If colors are set, each area will display a different color, otherwise all areas will display the same color Action 1
-        radarView.setColors(null);
-        // Set each title
-        radarView.setTitles(titles);
         // Set title color
         radarView.setTitleColor(Color.RED);
-        // Set the text of the values displayed by each item
-        radarView.setValues(values);
-        // Set the icon for each item
-        radarView.setDrawables(drawables);
         // Set the drawable padding for each item
         radarView.setDrawablePadding(20);
         // The setting allows connections between points
@@ -131,6 +119,15 @@ XRadarView supports a high degree of customization, and its adjustable attribute
         radarView.setLayerCount(5);
         // A single color without gradient colors
         radarView.setSingleColor(new Color(RgbPalette.parse("#800000ff")));
+        
+        // create node list
+        ArrayList<Node> nodeList = new ArrayList<>();
+        nodeList.add(new Node("Kill", "80", 0.8, ResourceTable.Media_icon, RgbPalette.parse("#A0ffcc00")));
+        nodeList.add(new Node("Money", "80%", 0.8, ResourceTable.Media_icon, RgbPalette.parse("#A000ff00")));
+        nodeList.add(new Node("Survival", "0.9", 0.9, ResourceTable.Media_icon, RgbPalette.parse("#A00000ff")));
+        nodeList.add(new Node("Defense", "100%", 1, ResourceTable.Media_icon, RgbPalette.parse("#A0FF00FF")));
+        
+        xRadarView.setNodeList(nodeList);
         
 ## Future Work
 1. Adding RichClientText support.

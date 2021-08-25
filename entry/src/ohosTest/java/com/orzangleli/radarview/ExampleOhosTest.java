@@ -17,19 +17,20 @@
 
 package com.orzangleli.radarview;
 
-import com.orzangleli.radar.XRadarView;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import ohos.aafwk.ability.delegation.AbilityDelegatorRegistry;
-import ohos.agp.colors.RgbPalette;
 import ohos.agp.components.Attr;
 import ohos.agp.components.AttrSet;
 import ohos.agp.utils.Color;
 import ohos.app.Context;
+import com.orzangleli.radar.XRadarView;
 import org.junit.Before;
 import org.junit.Test;
-
 import java.util.Optional;
 
-import static org.junit.Assert.*;
 
 public class ExampleOhosTest {
 
@@ -83,16 +84,6 @@ public class ExampleOhosTest {
     }
 
     @Test
-    public void testColors() {
-        int[] colors = new int[]{RgbPalette.parse("#A0ffcc00"), RgbPalette.parse("#A000ff00"),
-                RgbPalette.parse("#A00000ff"), RgbPalette.parse("#A0FF00FF"), RgbPalette.parse("#A000FFFF"),
-                RgbPalette.parse("#A0FFFF00"), RgbPalette.parse("#A000FF00"), RgbPalette.parse("#A0FF00FF")};
-
-        xRadarView.setColors(colors);
-        assertEquals(colors, xRadarView.getColors());
-    }
-
-    @Test
     public void testDrawableSize() {
         xRadarView.setDrawableSize(30);
         assertEquals(30, xRadarView.getDrawableSize());
@@ -135,21 +126,15 @@ public class ExampleOhosTest {
     }
 
     @Test
-    public void testEnabledAnimation() {
-        xRadarView.setEnabledAnimation(false);
-        assertFalse(xRadarView.isEnabledAnimation());
-    }
-
-    @Test
-    public void testEnabledShowPoint() {
-        xRadarView.setEnabledShowPoint(false);
-        assertFalse(xRadarView.isEnabledShowPoint());
-    }
-
-    @Test
     public void testCobwebColor() {
         xRadarView.setCobwebColor(Color.GREEN);
         assertEquals(Color.GREEN, xRadarView.getCobwebColor());
+    }
+
+    @Test
+    public void testSingleColor() {
+        xRadarView.setSingleColor(Color.GREEN);
+        assertEquals(Color.GREEN, xRadarView.getSingleColor());
     }
 
     @Test
@@ -165,6 +150,24 @@ public class ExampleOhosTest {
     }
 
     @Test
+    public void testBorderColor() {
+        xRadarView.setBorderColor(Color.GREEN);
+        assertEquals(Color.GREEN, xRadarView.getBorderColor());
+    }
+
+    @Test
+    public void testRadiusColor() {
+        xRadarView.setRadiusColor(Color.GREEN);
+        assertEquals(Color.GREEN, xRadarView.getRadiusColor());
+    }
+
+    @Test
+    public void testBoundaryWidth() {
+        xRadarView.setBoundaryWidth(5);
+        assertEquals(5, xRadarView.getBoundaryWidth());
+    }
+
+    @Test
     public void testPointRadius() {
         xRadarView.setPointRadius(5);
         assertEquals(5, xRadarView.getPointRadius());
@@ -177,27 +180,21 @@ public class ExampleOhosTest {
     }
 
     @Test
-    public void testBorderColor() {
-        xRadarView.setBorderColor(Color.GREEN);
-        assertEquals(Color.GREEN, xRadarView.getBorderColor());
+    public void testEnabledAnimation() {
+        xRadarView.setEnabledAnimation(false);
+        assertFalse(xRadarView.isEnabledAnimation());
     }
 
     @Test
-    public void testBoundaryWidth() {
-        xRadarView.setBoundaryWidth(5);
-        assertEquals(5, xRadarView.getBoundaryWidth());
+    public void testEnabledShowPoint() {
+        xRadarView.setEnabledShowPoint(false);
+        assertFalse(xRadarView.isEnabledShowPoint());
     }
 
     @Test
     public void testEnabledPolygon() {
         xRadarView.setEnabledPolygon(true);
         assertTrue(xRadarView.isEnabledPolygon());
-    }
-
-    @Test
-    public void testCircle() {
-        xRadarView.setEnabledCircularOutline(false);
-        assertFalse(xRadarView.isEnabledCircularOutline());
     }
 
     @Test
@@ -219,15 +216,27 @@ public class ExampleOhosTest {
     }
 
     @Test
-    public void testSingleColor() {
-        xRadarView.setSingleColor(Color.GREEN);
-        assertEquals(Color.GREEN, xRadarView.getSingleColor());
+    public void testCircle() {
+        xRadarView.setEnabledCircularOutline(false);
+        assertFalse(xRadarView.isEnabledCircularOutline());
+    }
+
+    @Test
+    public void testMultiColorRegion() {
+        xRadarView.setEnabledMultiColorRegion(false);
+        assertFalse(xRadarView.isEnabledMultiColorRegion());
     }
 
     @Test
     public void testEnabledRegionShader() {
         xRadarView.setEnabledRegionShader(false);
         assertFalse(xRadarView.isEnabledRegionShader());
+    }
+
+    @Test
+    public void testEnabledIcons() {
+        xRadarView.setEnableIcons(false);
+        assertFalse(xRadarView.isEnableIcons());
     }
 
     @Test

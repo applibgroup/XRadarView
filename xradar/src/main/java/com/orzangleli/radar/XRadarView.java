@@ -1,8 +1,5 @@
 package com.orzangleli.radar;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import ohos.agp.animation.Animator;
 import ohos.agp.animation.AnimatorValue;
 import ohos.agp.colors.RgbPalette;
@@ -24,13 +21,22 @@ import ohos.app.Context;
 import ohos.media.image.PixelMap;
 import ohos.media.image.common.Size;
 import ohos.multimodalinput.event.TouchEvent;
+import com.orzangleli.radar.utils.LogUtil;
+import com.orzangleli.radar.utils.Utils;
 import org.jetbrains.annotations.Nullable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 
 /**
  * XRadarView is a highly customizable radar view.
  * Created by lixiancheng on 2017/9/18.
  */
 public class XRadarView extends Component implements Component.DrawTask, Component.TouchEventListener {
+
+    private static final String TAG = XRadarView.class.getSimpleName();
 
     /* -------------------- ATTRIBUTE MEMBERS -------------------- */
 
@@ -109,6 +115,9 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
     // Whether the outer outline is circular
     private boolean enabledCircularOutline = false;
 
+    // Whether the region is draw with multi-color.
+    private boolean enabledMultiColorRegion = false;
+
     // The duration of the animation
     private int animDuration = 1000;
 
@@ -138,17 +147,22 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
     // Whether to paint the radar area as a gradient color
     private boolean enabledRegionShader = false;
 
+    // Whether icons are draw with title.
+    private boolean enableIcons = true;
+
     // The current scale ratio
     private float currentScale;
 
     private List<Rect> titleRects;
 
+    //array list of node.
+    private List<Node> nodeList;
     // array of icons
     private int[] drawables;
     // array of titles
     CharSequence[] titles;
     // Value for each property (0 to 1.0)
-    double[] percents;
+    Double[] percents;
     // Numeric text below each title
     CharSequence[] values;
     // array of multi-region area color
@@ -261,6 +275,9 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
             attr = attrSet.getAttr(Attribute.ENABLED_CIRCULAR_OUTLINE);
             enabledCircularOutline = attr.map(Attr::getBoolValue).orElse(false);
 
+            attr = attrSet.getAttr(Attribute.ENABLED_MULTI_COLOR_REGION);
+            enabledMultiColorRegion = attr.map(Attr::getBoolValue).orElse(false);
+
             attr = attrSet.getAttr(Attribute.ANIMATION_DURATION);
             animDuration = attr.map(Attr::getIntegerValue).orElse(1000);
         }
@@ -314,10 +331,11 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
 
         loadAnimation(enabledAnimation);
 
+        nodeList = new ArrayList<>();
         colors = new int[count];
         drawables = new int[count];
         titles = new CharSequence[count];
-        percents = new double[count];
+        percents = new Double[count];
         values = new CharSequence[count];
 
         addDrawTask(this);
@@ -370,6 +388,16 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
 
     @Override
     public void onDraw(Component component, Canvas canvas) {
+
+        if (count > nodeList.size()) {
+            LogUtil.error(
+                    TAG,
+                    "Count value is: " + count
+                            + " and size of node list is: " + nodeList.size()
+                            + ", Count value must be less than or equal to node list size!");
+            return;
+        }
+
         if (enabledShade) {
             drawLayer(canvas, startColor, endColor);
         } else {
@@ -384,10 +412,10 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
         if (enabledText) {
             drawText(canvas);
         }
-        if (colors == null || colors.length == 0) {
-            drawRegion(canvas, currentScale);
-        } else {
+        if (enabledMultiColorRegion) {
             drawRegionWithColor(canvas, currentScale);
+        } else {
+            drawRegion(canvas, currentScale);
         }
         if (enabledShowPoint) {
             drawPoint(canvas, currentScale);
@@ -582,7 +610,7 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
 
             CharSequence ss = getTitleCharSequence(i);
 
-            if (drawables == null) {
+            if (!enableIcons) {
                 drawables = new int[count];
             }
             if (Math.abs(curAngle - 3 * Math.PI / 2) < 0.1 || Math.abs(curAngle - Math.PI / 2) < 0.1) {
@@ -877,61 +905,29 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
     }
 
     /**
-     * Set icons array to drawables variable.
+     * Get node list.
      *
-     * @param drawables int array of resource ids.
+     * @return The node list instance.
      */
-    public void setDrawables(int[] drawables) {
-        this.drawables = drawables;
-        invalidate();
+    public List<Node> getNodeList() {
+        return nodeList;
     }
 
     /**
-     * Set percent values array.
+     * Set node list and parse titles, values, persents, drawables and colors array from given node list.
      *
-     * @param percents double array of percent values.
+     * @param nodeList The node list.
      */
-    public void setPercents(double[] percents) {
-        this.percents = percents;
-        invalidate();
-    }
+    public void setNodeList(List<Node> nodeList) {
+        this.nodeList = nodeList;
+        this.titles = nodeList.stream().map(Node::getTitle).collect(Collectors.toList()).toArray(titles);
+        this.values = nodeList.stream().map(Node::getValue).collect(Collectors.toList()).toArray(values);
+        this.percents = nodeList.stream().map(Node::getPercent).collect(Collectors.toList()).toArray(percents);
+        this.drawables = nodeList.stream().map(Node::getIconRef).collect(Collectors.toList())
+                .stream().mapToInt(Integer::intValue).toArray();
+        this.colors = nodeList.stream().map(Node::getColor).collect(Collectors.toList())
+                .stream().mapToInt(Integer::intValue).toArray();
 
-    /**
-     * Set titles array.
-     *
-     * @param titles CharSequence array of titles.
-     */
-    public void setTitles(CharSequence[] titles) {
-        this.titles = titles;
-        invalidate();
-    }
-
-    /**
-     * Set percent values array in CharSequence form.
-     *
-     * @param values CharSequence array of percent values.
-     */
-    public void setValues(CharSequence[] values) {
-        this.values = values;
-        invalidate();
-    }
-
-    /**
-     * Get colors array of multi-color region.
-     *
-     * @return int array of colors.
-     */
-    public int[] getColors() {
-        return colors;
-    }
-
-    /**
-     * Set colors array for multi-color region.
-     *
-     * @param colors int array of colors value.
-     */
-    public void setColors(int[] colors) {
-        this.colors = colors;
         invalidate();
     }
 
@@ -1108,46 +1104,6 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
     }
 
     /**
-     * Return the status of animation (Enabled or Disabled).
-     *
-     * @return true if the status of animation is enabled.
-     */
-    public boolean isEnabledAnimation() {
-        return enabledAnimation;
-    }
-
-    /**
-     * Sets whether animation is enable or not.
-     * It will reset the animation if the status has changed.
-     *
-     * @param enabledAnimation true if enable
-     */
-    public void setEnabledAnimation(boolean enabledAnimation) {
-        this.enabledAnimation = enabledAnimation;
-        invalidate();
-    }
-
-    /**
-     * Return the status of showPoint (Enabled or Disabled).
-     *
-     * @return true if the status of showPoint is enabled.
-     */
-    public boolean isEnabledShowPoint() {
-        return enabledShowPoint;
-    }
-
-    /**
-     * Sets whether showPoint is enable or not.
-     * It will reset the view if the status has changed.
-     *
-     * @param enabledShowPoint true if enable
-     */
-    public void setEnabledShowPoint(boolean enabledShowPoint) {
-        this.enabledShowPoint = enabledShowPoint;
-        invalidate();
-    }
-
-    /**
      * Get the cobweb color.
      *
      * @return Cobweb color in Color instance form.
@@ -1164,6 +1120,26 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
     public void setCobwebColor(Color cobwebColor) {
         this.cobwebColor = cobwebColor;
         cobwebPaint.setColor(cobwebColor);
+        invalidate();
+    }
+
+    /**
+     * Get the single color of area region.
+     *
+     * @return Single color in Color instance form.
+     */
+    public Color getSingleColor() {
+        return singleColor;
+    }
+
+    /**
+     * Set the single color.
+     *
+     * @param singleColor The color of area region when multi-color mode is disable.
+     */
+    public void setSingleColor(Color singleColor) {
+        this.singleColor = singleColor;
+        singlePaint.setColor(singleColor);
         invalidate();
     }
 
@@ -1208,6 +1184,64 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
     }
 
     /**
+     * Get the border color.
+     *
+     * @return Border color in Color instance form.
+     */
+    public Color getBorderColor() {
+        return borderColor;
+    }
+
+    /**
+     * Set the border color.
+     *
+     * @param borderColor The border color.
+     */
+    public void setBorderColor(Color borderColor) {
+        this.borderColor = borderColor;
+        borderPaint.setColor(borderColor);
+        invalidate();
+    }
+
+    /**
+     * Get the radius color.
+     * @return Radius color in Color instance form.
+     */
+    public Color getRadiusColor() {
+        return radiusColor;
+    }
+
+    /**
+     * Set the radius color.
+     * @param radiusColor The radius color.
+     */
+    public void setRadiusColor(Color radiusColor) {
+        this.radiusColor = radiusColor;
+        radiusPaint.setColor(radiusColor);
+        invalidate();
+    }
+
+    /**
+     * Get the boundary width.
+     *
+     * @return Boundary width in int form.
+     */
+    public int getBoundaryWidth() {
+        return boundaryWidth;
+    }
+
+    /**
+     * Set the boundary width.
+     *
+     * @param boundaryWidth The boundary width.
+     */
+    public void setBoundaryWidth(int boundaryWidth) {
+        this.boundaryWidth = boundaryWidth;
+        borderPaint.setStrokeWidth(boundaryWidth);
+        invalidate();
+    }
+
+    /**
      * Get the point radius.
      *
      * @return Point radius in int form.
@@ -1247,41 +1281,43 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
     }
 
     /**
-     * Get the border color.
+     * Return the status of animation (Enabled or Disabled).
      *
-     * @return Border color in Color instance form.
+     * @return true if the status of animation is enabled.
      */
-    public Color getBorderColor() {
-        return borderColor;
+    public boolean isEnabledAnimation() {
+        return enabledAnimation;
     }
 
     /**
-     * Set the border color.
+     * Sets whether animation is enable or not.
+     * It will reset the animation if the status has changed.
      *
-     * @param borderColor The border color.
+     * @param enabledAnimation true if enable
      */
-    public void setBorderColor(Color borderColor) {
-        this.borderColor = borderColor;
-        borderPaint.setColor(borderColor);
+    public void setEnabledAnimation(boolean enabledAnimation) {
+        this.enabledAnimation = enabledAnimation;
         invalidate();
     }
 
     /**
-     * Get the boundary width.
+     * Return the status of showPoint (Enabled or Disabled).
      *
-     * @return Boundary width in int form.
+     * @return true if the status of showPoint is enabled.
      */
-    public int getBoundaryWidth() {
-        return boundaryWidth;
+    public boolean isEnabledShowPoint() {
+        return enabledShowPoint;
     }
 
     /**
-     * Set the boundary width.
+     * Sets whether showPoint is enable or not.
+     * It will reset the view if the status has changed.
      *
-     * @param boundaryWidth The boundary width.
+     * @param enabledShowPoint true if enable
      */
-    public void setBoundaryWidth(int boundaryWidth) {
-        this.boundaryWidth = boundaryWidth;
+    public void setEnabledShowPoint(boolean enabledShowPoint) {
+        this.enabledShowPoint = enabledShowPoint;
+        invalidate();
     }
 
     /**
@@ -1301,26 +1337,6 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
      */
     public void setEnabledPolygon(boolean enabledPolygon) {
         this.enabledPolygon = enabledPolygon;
-        invalidate();
-    }
-
-    /**
-     * Return the status of area outline (Circular or not).
-     *
-     * @return true if the status of area outline is circular.
-     */
-    public boolean isEnabledCircularOutline() {
-        return enabledCircularOutline;
-    }
-
-    /**
-     * Sets whether area outline is circular or not.
-     * It will reset the view if the status has changed.
-     *
-     * @param enabledCircularOutline true if area outline is circular.
-     */
-    public void setEnabledCircularOutline(boolean enabledCircularOutline) {
-        this.enabledCircularOutline = enabledCircularOutline;
         invalidate();
     }
 
@@ -1385,22 +1401,40 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
     }
 
     /**
-     * Get the single color of area region.
+     * Return the status of area outline (Circular or not).
      *
-     * @return Single color in Color instance form.
+     * @return true if the status of area outline is circular.
      */
-    public Color getSingleColor() {
-        return singleColor;
+    public boolean isEnabledCircularOutline() {
+        return enabledCircularOutline;
     }
 
     /**
-     * Set the single color.
+     * Sets whether area outline is circular or not.
+     * It will reset the view if the status has changed.
      *
-     * @param singleColor The color of area region when multi-color mode is disable.
+     * @param enabledCircularOutline true if area outline is circular.
      */
-    public void setSingleColor(Color singleColor) {
-        this.singleColor = singleColor;
-        singlePaint.setColor(singleColor);
+    public void setEnabledCircularOutline(boolean enabledCircularOutline) {
+        this.enabledCircularOutline = enabledCircularOutline;
+        invalidate();
+    }
+
+    /**
+     * Return the status of region (is draw with multi-color or not).
+     * @return true if the status region is draw with multi-color.
+     */
+    public boolean isEnabledMultiColorRegion() {
+        return enabledMultiColorRegion;
+    }
+
+    /**
+     * Sets whether region is draw with multi-color.
+     *
+     * @param enabledMultiColorRegion true if region is draw with multi-color.
+     */
+    public void setEnabledMultiColorRegion(boolean enabledMultiColorRegion) {
+        this.enabledMultiColorRegion = enabledMultiColorRegion;
         invalidate();
     }
 
@@ -1422,6 +1456,25 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
     public void setEnabledRegionShader(boolean enabled) {
         this.enabledRegionShader = enabled;
         postLayout();
+        invalidate();
+    }
+
+    /**
+     * Return the status of icons (enabled or disabled).
+     * @return true if the status of icons is enabled.
+     */
+    public boolean isEnableIcons() {
+        return enableIcons;
+    }
+
+    /**
+     * Set whether icons are enable or not.
+     * @param enableIcons true if icons is enable.
+     */
+    public void setEnableIcons(boolean enableIcons) {
+        this.enableIcons = enableIcons;
+        drawables = nodeList.stream().map(Node::getIconRef).collect(Collectors.toList())
+                .stream().mapToInt(Integer::intValue).toArray();
         invalidate();
     }
 
