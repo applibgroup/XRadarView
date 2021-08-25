@@ -6,7 +6,7 @@ XRadarView supports a high degree of customization, and its adjustable attribute
 
 |Attributes  | meaning |
 |:-------------:|:-------------:|
-|count|Polygonal edge count|
+|count|Polygonal edge count (note: Value must be less than or equal to nodelist size.)|
 |layerCount|Several layers of spider webs|
 |drawableSize|Icon size (Recommended size should be between 8vp - 26vp)|
 |drawablePadding|Icon and text spacing|
