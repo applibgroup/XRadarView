@@ -1,0 +1,36 @@
+{
+  "color": [
+    {
+      "name": "single",
+      "value": "#800000ff"
+    },
+    {
+      "name": "kill",
+      "value": "#A0ffcc00"
+    },
+    {
+      "name": "money",
+      "value": "#A000ff00"
+    },
+    {
+      "name": "survival",
+      "value": "#A00000ff"
+    },
+    {
+      "name": "defense",
+      "value": "#A0FF00FF"
+    },
+    {
+      "name": "rubik_cube",
+      "value": "#A000FFFF"
+    },
+    {
+      "name": "physics",
+      "value": "#A0FFFF00"
+    },
+    {
+      "name": "assists",
+      "value": "#A000FF00"
+    }
+  ]
+}

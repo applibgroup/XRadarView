@@ -45,20 +45,17 @@ public class Utils {
      * @return the path from id
      */
     public static String getPathById(Context context, int id) {
-        String path = "";
-        if (context == null) {
-            return path;
+        if (context != null) {
+            ResourceManager manager = context.getResourceManager();
+            if (manager != null) {
+                try {
+                    return manager.getMediaPath(id);
+                } catch (IOException | NotExistException | WrongTypeException e) {
+                    return "";
+                }
+            }
         }
-        ResourceManager manager = context.getResourceManager();
-        if (manager == null) {
-            return path;
-        }
-        try {
-            path = manager.getMediaPath(id);
-        } catch (IOException | NotExistException | WrongTypeException e) {
-            path = "";
-        }
-        return path;
+        return "";
     }
 
     /**
@@ -73,6 +70,11 @@ public class Utils {
         if (path == null || path.length() == 0) {
             return Optional.empty();
         }
+
+        if (context == null) {
+            return Optional.empty();
+        }
+
         RawFileEntry assetManager = context.getResourceManager().getRawFileEntry(path);
         ImageSource.SourceOptions options = new ImageSource.SourceOptions();
         options.formatHint = "image/png";

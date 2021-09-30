@@ -20,7 +20,6 @@ package com.orzangleli.radarview.slice;
 import static ohos.agp.components.ComponentContainer.LayoutConfig.MATCH_CONTENT;
 import ohos.aafwk.ability.AbilitySlice;
 import ohos.aafwk.content.Intent;
-import ohos.agp.colors.RgbPalette;
 import ohos.agp.components.AbsButton;
 import ohos.agp.components.Button;
 import ohos.agp.components.DirectionalLayout;
@@ -159,7 +158,7 @@ public class MainAbilitySlice extends AbilitySlice implements AbsButton.CheckedS
         // Set the number of layers
         radarView.setLayerCount(5);
         // A single color without gradient colors
-        radarView.setSingleColor(new Color(RgbPalette.parse("#800000ff")));
+        radarView.setSingleColor(new Color(getColor(ResourceTable.Color_single)));
         // Configure the area gradient, and the second parameter needs to be fine-tuned to get good results
         radarView.setRegionShaderConfig(new Color[]{Color.YELLOW, Color.RED}, new float[]{0.2f, 0.6f});
 
@@ -310,13 +309,41 @@ public class MainAbilitySlice extends AbilitySlice implements AbsButton.CheckedS
     private ArrayList<Node> getNodeList() {
         ArrayList<Node> nodeList = new ArrayList<>();
 
-        nodeList.add(new Node("Kill", "80", 0.8, ResourceTable.Media_icon, RgbPalette.parse("#A0ffcc00")));
-        nodeList.add(new Node("Money", "80%", 0.8, ResourceTable.Media_icon, RgbPalette.parse("#A000ff00")));
-        nodeList.add(new Node("Survival", "0.9", 0.9, ResourceTable.Media_icon, RgbPalette.parse("#A00000ff")));
-        nodeList.add(new Node("Defense", "100%", 1, ResourceTable.Media_icon, RgbPalette.parse("#A0FF00FF")));
-        nodeList.add(new Node("Rubik's Cube", "3/5", 0.6, ResourceTable.Media_icon, RgbPalette.parse("#A000FFFF")));
-        nodeList.add(new Node("Physics", "50%", 0.5, ResourceTable.Media_icon, RgbPalette.parse("#A0FFFF00")));
-        nodeList.add(new Node("Assists", "0.77个", 0.77, ResourceTable.Media_icon, RgbPalette.parse("#A000FF00")));
+        nodeList.add(new Node("Kill",
+                "80",
+                0.8,
+                ResourceTable.Media_icon,
+                getColor(ResourceTable.Color_kill)));
+        nodeList.add(new Node("Money",
+                "80%",
+                0.8,
+                ResourceTable.Media_icon,
+                getColor(ResourceTable.Color_money)));
+        nodeList.add(new Node("Survival",
+                "0.9",
+                0.9,
+                ResourceTable.Media_icon,
+                getColor(ResourceTable.Color_survival)));
+        nodeList.add(new Node("Defense",
+                "100%",
+                1,
+                ResourceTable.Media_icon,
+                getColor(ResourceTable.Color_defense)));
+        nodeList.add(new Node("Rubik's Cube",
+                "3/5",
+                0.6,
+                ResourceTable.Media_icon,
+                getColor(ResourceTable.Color_rubik_cube)));
+        nodeList.add(new Node("Physics",
+                "50%",
+                0.5,
+                ResourceTable.Media_icon,
+                getColor(ResourceTable.Color_physics)));
+        nodeList.add(new Node("Assists",
+                "0.77个",
+                0.77,
+                ResourceTable.Media_icon,
+                getColor(ResourceTable.Color_assists)));
 
         return nodeList;
     }

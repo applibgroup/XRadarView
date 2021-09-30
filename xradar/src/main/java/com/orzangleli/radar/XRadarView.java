@@ -2,7 +2,6 @@ package com.orzangleli.radar;
 
 import ohos.agp.animation.Animator;
 import ohos.agp.animation.AnimatorValue;
-import ohos.agp.colors.RgbPalette;
 import ohos.agp.components.Attr;
 import ohos.agp.components.AttrSet;
 import ohos.agp.components.Component;
@@ -62,10 +61,10 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
     private float radarPercent = 0.7f;
 
     // When the gradient is turned on, the color at the center of the circle
-    private Color startColor = new Color(RgbPalette.parse("#80FF0000"));
+    private Color startColor = new Color(getContext().getColor(ResourceTable.Color_start_circle));
 
     // When the gradient is turned on, the color at the outer circle
-    private Color endColor = new Color(RgbPalette.parse("#8000FF00"));
+    private Color endColor = new Color(getContext().getColor(ResourceTable.Color_end_circle));
 
     // The color of the cobweb line
     private Color cobwebColor;
@@ -222,28 +221,36 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
             radarPercent = attr.map(Attr::getFloatValue).orElse(0.7f);
 
             attr = attrSet.getAttr(Attribute.START_COLOR);
-            startColor = attr.map(Attr::getColorValue).orElse(new Color(RgbPalette.parse("#80FFCC33")));
+            startColor = attr.map(Attr::getColorValue)
+                    .orElse(new Color(getContext().getColor(ResourceTable.Color_start_circle)));
 
             attr = attrSet.getAttr(Attribute.END_COLOR);
-            endColor = attr.map(Attr::getColorValue).orElse(new Color(RgbPalette.parse("#80FFFFCC")));
+            endColor = attr.map(Attr::getColorValue)
+                    .orElse(new Color(getContext().getColor(ResourceTable.Color_end_circle)));
 
             attr = attrSet.getAttr(Attribute.COBWEB_COLOR);
-            cobwebColor = attr.map(Attr::getColorValue).orElse(new Color(RgbPalette.parse("#80444444")));
+            cobwebColor = attr.map(Attr::getColorValue)
+                    .orElse(new Color(getContext().getColor(ResourceTable.Color_cobweb)));
 
             attr = attrSet.getAttr(Attribute.SINGLE_COLOR);
-            singleColor = attr.map(Attr::getColorValue).orElse(new Color(RgbPalette.parse("#80CC0000")));
+            singleColor = attr.map(Attr::getColorValue)
+                    .orElse(new Color(getContext().getColor(ResourceTable.Color_single)));
 
             attr = attrSet.getAttr(Attribute.TITLE_COLOR);
-            titleColor = attr.map(Attr::getColorValue).orElse(new Color(RgbPalette.parse("#80000000")));
+            titleColor = attr.map(Attr::getColorValue)
+                    .orElse(new Color(getContext().getColor(ResourceTable.Color_title)));
 
             attr = attrSet.getAttr(Attribute.POINT_COLOR);
-            pointColor = attr.map(Attr::getColorValue).orElse(new Color(RgbPalette.parse("#80333366")));
+            pointColor = attr.map(Attr::getColorValue)
+                    .orElse(new Color(getContext().getColor(ResourceTable.Color_point)));
 
             attr = attrSet.getAttr(Attribute.BORDER_COLOR);
-            borderColor = attr.map(Attr::getColorValue).orElse(new Color(RgbPalette.parse("#80333366")));
+            borderColor = attr.map(Attr::getColorValue)
+                    .orElse(new Color(getContext().getColor(ResourceTable.Color_border)));
 
             attr = attrSet.getAttr(Attribute.RADIUS_COLOR);
-            radiusColor = attr.map(Attr::getColorValue).orElse(new Color(RgbPalette.parse("#80CCCCCC")));
+            radiusColor = attr.map(Attr::getColorValue)
+                    .orElse(new Color(getContext().getColor(ResourceTable.Color_radius)));
 
             attr = attrSet.getAttr(Attribute.BOUNDARY_WIDTH);
             boundaryWidth = attr.map(Attr::getDimensionValue).orElse(5);
@@ -1205,6 +1212,7 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
 
     /**
      * Get the radius color.
+     *
      * @return Radius color in Color instance form.
      */
     public Color getRadiusColor() {
@@ -1213,6 +1221,7 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
 
     /**
      * Set the radius color.
+     *
      * @param radiusColor The radius color.
      */
     public void setRadiusColor(Color radiusColor) {
@@ -1422,6 +1431,7 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
 
     /**
      * Return the status of region (is draw with multi-color or not).
+     *
      * @return true if the status region is draw with multi-color.
      */
     public boolean isEnabledMultiColorRegion() {
@@ -1461,6 +1471,7 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
 
     /**
      * Return the status of icons (enabled or disabled).
+     *
      * @return true if the status of icons is enabled.
      */
     public boolean isEnableIcons() {
@@ -1469,6 +1480,7 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
 
     /**
      * Set whether icons are enable or not.
+     *
      * @param enableIcons true if icons is enable.
      */
     public void setEnableIcons(boolean enableIcons) {
