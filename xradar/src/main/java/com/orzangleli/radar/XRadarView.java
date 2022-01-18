@@ -1,11 +1,7 @@
 package com.orzangleli.radar;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import ohos.agp.animation.Animator;
 import ohos.agp.animation.AnimatorValue;
-import ohos.agp.colors.RgbPalette;
 import ohos.agp.components.Attr;
 import ohos.agp.components.AttrSet;
 import ohos.agp.components.Component;
@@ -24,7 +20,14 @@ import ohos.app.Context;
 import ohos.media.image.PixelMap;
 import ohos.media.image.common.Size;
 import ohos.multimodalinput.event.TouchEvent;
+import com.orzangleli.radar.utils.LogUtil;
+import com.orzangleli.radar.utils.Utils;
 import org.jetbrains.annotations.Nullable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 
 /**
  * XRadarView is a highly customizable radar view.
@@ -32,45 +35,37 @@ import org.jetbrains.annotations.Nullable;
  */
 public class XRadarView extends Component implements Component.DrawTask, Component.TouchEventListener {
 
-    //attributes
-    private static final String ATTRIBUTE_COUNT = "count";
-    private static final String ATTRIBUTE_LAYER_COUNT = "layerCount";
-    private static final String ATTRIBUTE_DRAWABLE_SIZE = "drawableSize";
-    private static final String ATTRIBUTE_DRAWABLE_PADDING = "drawablePadding";
-    private static final String ATTRIBUTE_DESC_PADDING = "descPadding";
-    private static final String ATTRIBUTE_TITLE_SIZE = "titleSize";
-    private static final String ATTRIBUTE_RADAR_PERCENT = "radarPercent";
-    private static final String ATTRIBUTE_START_COLOR = "startColor";
-    private static final String ATTRIBUTE_END_COLOR = "endColor";
-    private static final String ATTRIBUTE_COBWEB_COLOR = "cobwebColor";
-    private static final String ATTRIBUTE_SINGLE_COLOR = "singleColor";
-    private static final String ATTRIBUTE_TITLE_COLOR = "titleColor";
-    private static final String ATTRIBUTE_POINT_COLOR = "pointColor";
-    private static final String ATTRIBUTE_BORDER_COLOR = "borderColor";
-    private static final String ATTRIBUTE_RADIUS_COLOR = "radiusColor";
-    private static final String ATTRIBUTE_BOUNDARY_WIDTH = "boundaryWidth";
-    private static final String ATTRIBUTE_POINT_RADIUS = "pointRadius";
-    private static final String ATTRIBUTE_ENABLED_BORDER = "enabledBorder";
-    private static final String ATTRIBUTE_ENABLED_ANIMATION = "enabledAnimation";
-    private static final String ATTRIBUTE_ENABLED_SHOW_POINT = "enabledShowPoint";
-    private static final String ATTRIBUTE_ENABLED_POLYGON = "enabledPolygon";
-    private static final String ATTRIBUTE_ENABLED_SHADE = "enabledShade";
-    private static final String ATTRIBUTE_ENABLED_RADIUS = "enabledRadius";
-    private static final String ATTRIBUTE_ENABLED_TEXT = "enabledText";
-    private static final String ATTRIBUTE_ANIMATION_DURATION = "animDuration";
+    private static final String TAG = XRadarView.class.getSimpleName();
+
+    /* -------------------- ATTRIBUTE MEMBERS -------------------- */
 
     // Several-sided radar
     private int count = 5;
-    private int layerCount = 6;  // Number of layer
+
+    // Number of layer
+    private int layerCount = 6;
+
+    // Size of icons
     private int drawableSize = 40;
+
+    // Icon and text spacing
     private int drawablePadding = 10;
+
+    // Title and node spacing
     private int descPadding = 5;
+
+    // Title size
     private int titleSize = 40;
 
+    // The ratio of the radar chart graphic to the entire space
     private float radarPercent = 0.7f;
 
-    private Color startColor = new Color(RgbPalette.parse("#80FF0000"));
-    private Color endColor = new Color(RgbPalette.parse("#8000FF00"));
+    // When the gradient is turned on, the color at the center of the circle
+    private Color startColor = new Color(getContext().getColor(ResourceTable.Color_start_circle));
+
+    // When the gradient is turned on, the color at the outer circle
+    private Color endColor = new Color(getContext().getColor(ResourceTable.Color_end_circle));
+
     // The color of the cobweb line
     private Color cobwebColor;
 
@@ -79,40 +74,59 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
 
     // The color of the title text
     private Color titleColor;
+
     // Dot color
     private Color pointColor;
-    // The size of the dot radius
-    private int pointRadius;
+
     // The color of the boundary line
     private Color borderColor;
-    // The width of the boundary line
-    private int boundaryWidth;
+
     // The color of the radius line
     private Color radiusColor;
-    // Radar chart gradient color array
-    private Color[] shaderColors;
-    // The location of various color distributions of radar map gradient colors
-    private float[] shaderPositions;
 
+    // The width of the boundary line
+    private int boundaryWidth;
+
+    // The size of the dot radius
+    private int pointRadius;
 
     // Whether to draw a boundary line
     private boolean enabledBorder = false;
+
     // Whether to turn on the animation
     private boolean enabledAnimation = true;
-    // The duration of the animation
-    private int animDuration = 1000;
+
     // Whether the dot is displayed
     private boolean enabledShowPoint = true;
+
     // Whether to draw the grid
     private boolean enabledPolygon = true;
+
     // Whether to draw a gradient ring
     private boolean enabledShade = true;
+
     // Whether to draw the radius
     private boolean enabledRadius = true;
+
     // Whether to draw the text
     private boolean enabledText = true;
-    // Whether to paint the radar area as a gradient color
-    private boolean enabledRegionShader = false;
+
+    // Whether the outer outline is circular
+    private boolean enabledCircularOutline = false;
+
+    // Whether the region is draw with multi-color.
+    private boolean enabledMultiColorRegion = false;
+
+    // The duration of the animation
+    private int animDuration = 1000;
+
+    /* -------------------- REQUIRED FIELDS -------------------- */
+
+    // Radar chart gradient color array
+    private Color[] shaderColors;
+
+    // The location of various color distributions of radar map gradient colors
+    private float[] shaderPositions;
 
     // Text maximum allowable width
     private int maxTextWidth;
@@ -126,12 +140,35 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
     // radius
     private float radius;
 
-    // Whether the outer outline is circular
-    private boolean isCircle = false;
-
     // Area gradient shader
     private Shader regionShader;
 
+    // Whether to paint the radar area as a gradient color
+    private boolean enabledRegionShader = false;
+
+    // Whether icons are draw with title.
+    private boolean enableIcons = true;
+
+    // The current scale ratio
+    private float currentScale;
+
+    private List<Rect> titleRects;
+
+    //array list of node.
+    private List<Node> nodeList;
+    // array of icons
+    private int[] drawables;
+    // array of titles
+    CharSequence[] titles;
+    // Value for each property (0 to 1.0)
+    Double[] percents;
+    // Numeric text below each title
+    CharSequence[] values;
+    // array of multi-region area color
+    int[] colors;
+
+
+    /* -------------------- PAINT & DRAW -------------------- */
     private Paint cobwebPaint;
     private Paint multiRegionPaint;
     private Paint singlePaint;
@@ -141,33 +178,15 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
     private Paint radiusPaint;
     private Paint borderPaint;
 
-
-    // The current scale ratio
-    private float currentScale;
-
-    private List<Rect> titleRects;
-
-    // icon
-    private int[] drawables;
-    // title
-    CharSequence[] titles;
-    // Value for each property (0 to 1.0)
-    double[] percents;
-    // Numeric text below each title
-    CharSequence[] values;
-    // The area color
-    int[] colors;
-
+    /* -------------------- Interfaces -------------------- */
     OnTitleClickListener onTitleClickListener;
 
     public XRadarView(Context context) {
-        this(context, null, 0);
-        init(null);
+        this(context, null);
     }
 
     public XRadarView(Context context, @Nullable AttrSet attrs) {
         this(context, attrs, 0);
-        init(attrs);
     }
 
     public XRadarView(Context context, @Nullable AttrSet attrs, int defStyleAttr) {
@@ -180,79 +199,93 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
         Optional<Attr> attr;
         if (attrSet != null) {
 
-            attr = attrSet.getAttr(ATTRIBUTE_COUNT);
+            attr = attrSet.getAttr(Attribute.COUNT);
             count = attr.map(Attr::getIntegerValue).orElse(6);
 
-            attr = attrSet.getAttr(ATTRIBUTE_LAYER_COUNT);
+            attr = attrSet.getAttr(Attribute.LAYER_COUNT);
             layerCount = attr.map(Attr::getIntegerValue).orElse(6);
 
-            attr = attrSet.getAttr(ATTRIBUTE_DRAWABLE_SIZE);
+            attr = attrSet.getAttr(Attribute.DRAWABLE_SIZE);
             drawableSize = attr.map(Attr::getDimensionValue).orElse(40);
 
-            attr = attrSet.getAttr(ATTRIBUTE_DRAWABLE_PADDING);
+            attr = attrSet.getAttr(Attribute.DRAWABLE_PADDING);
             drawablePadding = attr.map(Attr::getDimensionValue).orElse(10);
 
-            attr = attrSet.getAttr(ATTRIBUTE_DESC_PADDING);
+            attr = attrSet.getAttr(Attribute.DESC_PADDING);
             descPadding = attr.map(Attr::getDimensionValue).orElse(5);
 
-            attr = attrSet.getAttr(ATTRIBUTE_TITLE_SIZE);
+            attr = attrSet.getAttr(Attribute.TITLE_SIZE);
             titleSize = attr.map(Attr::getDimensionValue).orElse(40);
 
-            attr = attrSet.getAttr(ATTRIBUTE_RADAR_PERCENT);
+            attr = attrSet.getAttr(Attribute.RADAR_PERCENT);
             radarPercent = attr.map(Attr::getFloatValue).orElse(0.7f);
 
-            attr = attrSet.getAttr(ATTRIBUTE_START_COLOR);
-            startColor = attr.map(Attr::getColorValue).orElse(new Color(RgbPalette.parse("#80FFCC33")));
+            attr = attrSet.getAttr(Attribute.START_COLOR);
+            startColor = attr.map(Attr::getColorValue)
+                    .orElse(new Color(getContext().getColor(ResourceTable.Color_start_circle)));
 
-            attr = attrSet.getAttr(ATTRIBUTE_END_COLOR);
-            endColor = attr.map(Attr::getColorValue).orElse(new Color(RgbPalette.parse("#80FFFFCC")));
+            attr = attrSet.getAttr(Attribute.END_COLOR);
+            endColor = attr.map(Attr::getColorValue)
+                    .orElse(new Color(getContext().getColor(ResourceTable.Color_end_circle)));
 
-            attr = attrSet.getAttr(ATTRIBUTE_COBWEB_COLOR);
-            cobwebColor = attr.map(Attr::getColorValue).orElse(new Color(RgbPalette.parse("#80444444")));
+            attr = attrSet.getAttr(Attribute.COBWEB_COLOR);
+            cobwebColor = attr.map(Attr::getColorValue)
+                    .orElse(new Color(getContext().getColor(ResourceTable.Color_cobweb)));
 
-            attr = attrSet.getAttr(ATTRIBUTE_SINGLE_COLOR);
-            singleColor = attr.map(Attr::getColorValue).orElse(new Color(RgbPalette.parse("#80CC0000")));
+            attr = attrSet.getAttr(Attribute.SINGLE_COLOR);
+            singleColor = attr.map(Attr::getColorValue)
+                    .orElse(new Color(getContext().getColor(ResourceTable.Color_single)));
 
-            attr = attrSet.getAttr(ATTRIBUTE_TITLE_COLOR);
-            titleColor = attr.map(Attr::getColorValue).orElse(new Color(RgbPalette.parse("#80000000")));
+            attr = attrSet.getAttr(Attribute.TITLE_COLOR);
+            titleColor = attr.map(Attr::getColorValue)
+                    .orElse(new Color(getContext().getColor(ResourceTable.Color_title)));
 
-            attr = attrSet.getAttr(ATTRIBUTE_POINT_COLOR);
-            pointColor = attr.map(Attr::getColorValue).orElse(new Color(RgbPalette.parse("#80333366")));
+            attr = attrSet.getAttr(Attribute.POINT_COLOR);
+            pointColor = attr.map(Attr::getColorValue)
+                    .orElse(new Color(getContext().getColor(ResourceTable.Color_point)));
 
-            attr = attrSet.getAttr(ATTRIBUTE_BORDER_COLOR);
-            borderColor = attr.map(Attr::getColorValue).orElse(new Color(RgbPalette.parse("#80333366")));
+            attr = attrSet.getAttr(Attribute.BORDER_COLOR);
+            borderColor = attr.map(Attr::getColorValue)
+                    .orElse(new Color(getContext().getColor(ResourceTable.Color_border)));
 
-            attr = attrSet.getAttr(ATTRIBUTE_RADIUS_COLOR);
-            radiusColor = attr.map(Attr::getColorValue).orElse(new Color(RgbPalette.parse("#80CCCCCC")));
+            attr = attrSet.getAttr(Attribute.RADIUS_COLOR);
+            radiusColor = attr.map(Attr::getColorValue)
+                    .orElse(new Color(getContext().getColor(ResourceTable.Color_radius)));
 
-            attr = attrSet.getAttr(ATTRIBUTE_BOUNDARY_WIDTH);
+            attr = attrSet.getAttr(Attribute.BOUNDARY_WIDTH);
             boundaryWidth = attr.map(Attr::getDimensionValue).orElse(5);
 
-            attr = attrSet.getAttr(ATTRIBUTE_POINT_RADIUS);
+            attr = attrSet.getAttr(Attribute.POINT_RADIUS);
             pointRadius = attr.map(Attr::getDimensionValue).orElse(10);
 
-            attr = attrSet.getAttr(ATTRIBUTE_ENABLED_BORDER);
+            attr = attrSet.getAttr(Attribute.ENABLED_BORDER);
             enabledBorder = attr.map(Attr::getBoolValue).orElse(false);
 
-            attr = attrSet.getAttr(ATTRIBUTE_ENABLED_ANIMATION);
+            attr = attrSet.getAttr(Attribute.ENABLED_ANIMATION);
             enabledAnimation = attr.map(Attr::getBoolValue).orElse(true);
 
-            attr = attrSet.getAttr(ATTRIBUTE_ENABLED_SHOW_POINT);
+            attr = attrSet.getAttr(Attribute.ENABLED_SHOW_POINT);
             enabledShowPoint = attr.map(Attr::getBoolValue).orElse(true);
 
-            attr = attrSet.getAttr(ATTRIBUTE_ENABLED_POLYGON);
+            attr = attrSet.getAttr(Attribute.ENABLED_POLYGON);
             enabledPolygon = attr.map(Attr::getBoolValue).orElse(true);
 
-            attr = attrSet.getAttr(ATTRIBUTE_ENABLED_SHADE);
+            attr = attrSet.getAttr(Attribute.ENABLED_SHADE);
             enabledShade = attr.map(Attr::getBoolValue).orElse(true);
 
-            attr = attrSet.getAttr(ATTRIBUTE_ENABLED_RADIUS);
+            attr = attrSet.getAttr(Attribute.ENABLED_RADIUS);
             enabledRadius = attr.map(Attr::getBoolValue).orElse(true);
 
-            attr = attrSet.getAttr(ATTRIBUTE_ENABLED_TEXT);
+            attr = attrSet.getAttr(Attribute.ENABLED_TEXT);
             enabledText = attr.map(Attr::getBoolValue).orElse(true);
 
-            attr = attrSet.getAttr(ATTRIBUTE_ANIMATION_DURATION);
+            attr = attrSet.getAttr(Attribute.ENABLED_CIRCULAR_OUTLINE);
+            enabledCircularOutline = attr.map(Attr::getBoolValue).orElse(false);
+
+            attr = attrSet.getAttr(Attribute.ENABLED_MULTI_COLOR_REGION);
+            enabledMultiColorRegion = attr.map(Attr::getBoolValue).orElse(false);
+
+            attr = attrSet.getAttr(Attribute.ANIMATION_DURATION);
             animDuration = attr.map(Attr::getIntegerValue).orElse(1000);
         }
 
@@ -305,10 +338,11 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
 
         loadAnimation(enabledAnimation);
 
+        nodeList = new ArrayList<>();
         colors = new int[count];
         drawables = new int[count];
         titles = new CharSequence[count];
-        percents = new double[count];
+        percents = new Double[count];
         values = new CharSequence[count];
 
         addDrawTask(this);
@@ -361,6 +395,16 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
 
     @Override
     public void onDraw(Component component, Canvas canvas) {
+
+        if (count > nodeList.size()) {
+            LogUtil.error(
+                    TAG,
+                    "Count value is: " + count
+                            + " and size of node list is: " + nodeList.size()
+                            + ", Count value must be less than or equal to node list size!");
+            return;
+        }
+
         if (enabledShade) {
             drawLayer(canvas, startColor, endColor);
         } else {
@@ -375,10 +419,10 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
         if (enabledText) {
             drawText(canvas);
         }
-        if (colors == null || colors.length == 0) {
-            drawRegion(canvas, currentScale);
-        } else {
+        if (enabledMultiColorRegion) {
             drawRegionWithColor(canvas, currentScale);
+        } else {
+            drawRegion(canvas, currentScale);
         }
         if (enabledShowPoint) {
             drawPoint(canvas, currentScale);
@@ -460,7 +504,7 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
         for (int i = layerCount; i >= 1; i--) {
             float curR = r * i;
             path.reset();
-            if (isCircle) {
+            if (enabledCircularOutline) {
                 path.addCircle(centerX, centerY, curR, Path.Direction.CLOCK_WISE);
             } else {
                 for (int j = 0; j < count; j++) {
@@ -493,7 +537,7 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
             float curR = r * i;
             path = new Path();
             for (int j = 0; j < count; j++) {
-                if (isCircle) {
+                if (enabledCircularOutline) {
                     path.addCircle(centerX, centerY, curR, Path.Direction.CLOCK_WISE);
                 } else {
                     if (j == 0) {
@@ -573,7 +617,7 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
 
             CharSequence ss = getTitleCharSequence(i);
 
-            if (drawables == null) {
+            if (!enableIcons) {
                 drawables = new int[count];
             }
             if (Math.abs(curAngle - 3 * Math.PI / 2) < 0.1 || Math.abs(curAngle - Math.PI / 2) < 0.1) {
@@ -868,61 +912,29 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
     }
 
     /**
-     * Set icons array to drawables variable.
+     * Get node list.
      *
-     * @param drawables int array of resource ids.
+     * @return The node list instance.
      */
-    public void setDrawables(int[] drawables) {
-        this.drawables = drawables;
-        invalidate();
+    public List<Node> getNodeList() {
+        return nodeList;
     }
 
     /**
-     * Set percent values array.
+     * Set node list and parse titles, values, persents, drawables and colors array from given node list.
      *
-     * @param percents double array of percent values.
+     * @param nodeList The node list.
      */
-    public void setPercents(double[] percents) {
-        this.percents = percents;
-        invalidate();
-    }
+    public void setNodeList(List<Node> nodeList) {
+        this.nodeList = nodeList;
+        this.titles = nodeList.stream().map(Node::getTitle).collect(Collectors.toList()).toArray(titles);
+        this.values = nodeList.stream().map(Node::getValue).collect(Collectors.toList()).toArray(values);
+        this.percents = nodeList.stream().map(Node::getPercent).collect(Collectors.toList()).toArray(percents);
+        this.drawables = nodeList.stream().map(Node::getIconRef).collect(Collectors.toList())
+                .stream().mapToInt(Integer::intValue).toArray();
+        this.colors = nodeList.stream().map(Node::getColor).collect(Collectors.toList())
+                .stream().mapToInt(Integer::intValue).toArray();
 
-    /**
-     * Set titles array.
-     *
-     * @param titles CharSequence array of titles.
-     */
-    public void setTitles(CharSequence[] titles) {
-        this.titles = titles;
-        invalidate();
-    }
-
-    /**
-     * Set percent values array in CharSequence form.
-     *
-     * @param values CharSequence array of percent values.
-     */
-    public void setValues(CharSequence[] values) {
-        this.values = values;
-        invalidate();
-    }
-
-    /**
-     * Get colors array of multi-color region.
-     *
-     * @return int array of colors.
-     */
-    public int[] getColors() {
-        return colors;
-    }
-
-    /**
-     * Set colors array for multi-color region.
-     *
-     * @param colors int array of colors value.
-     */
-    public void setColors(int[] colors) {
-        this.colors = colors;
         invalidate();
     }
 
@@ -1099,46 +1111,6 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
     }
 
     /**
-     * Return the status of animation (Enabled or Disabled).
-     *
-     * @return true if the status of animation is enabled.
-     */
-    public boolean isEnabledAnimation() {
-        return enabledAnimation;
-    }
-
-    /**
-     * Sets whether animation is enable or not.
-     * It will reset the animation if the status has changed.
-     *
-     * @param enabledAnimation true if enable
-     */
-    public void setEnabledAnimation(boolean enabledAnimation) {
-        this.enabledAnimation = enabledAnimation;
-        invalidate();
-    }
-
-    /**
-     * Return the status of showPoint (Enabled or Disabled).
-     *
-     * @return true if the status of showPoint is enabled.
-     */
-    public boolean isEnabledShowPoint() {
-        return enabledShowPoint;
-    }
-
-    /**
-     * Sets whether showPoint is enable or not.
-     * It will reset the view if the status has changed.
-     *
-     * @param enabledShowPoint true if enable
-     */
-    public void setEnabledShowPoint(boolean enabledShowPoint) {
-        this.enabledShowPoint = enabledShowPoint;
-        invalidate();
-    }
-
-    /**
      * Get the cobweb color.
      *
      * @return Cobweb color in Color instance form.
@@ -1155,6 +1127,26 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
     public void setCobwebColor(Color cobwebColor) {
         this.cobwebColor = cobwebColor;
         cobwebPaint.setColor(cobwebColor);
+        invalidate();
+    }
+
+    /**
+     * Get the single color of area region.
+     *
+     * @return Single color in Color instance form.
+     */
+    public Color getSingleColor() {
+        return singleColor;
+    }
+
+    /**
+     * Set the single color.
+     *
+     * @param singleColor The color of area region when multi-color mode is disable.
+     */
+    public void setSingleColor(Color singleColor) {
+        this.singleColor = singleColor;
+        singlePaint.setColor(singleColor);
         invalidate();
     }
 
@@ -1199,6 +1191,66 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
     }
 
     /**
+     * Get the border color.
+     *
+     * @return Border color in Color instance form.
+     */
+    public Color getBorderColor() {
+        return borderColor;
+    }
+
+    /**
+     * Set the border color.
+     *
+     * @param borderColor The border color.
+     */
+    public void setBorderColor(Color borderColor) {
+        this.borderColor = borderColor;
+        borderPaint.setColor(borderColor);
+        invalidate();
+    }
+
+    /**
+     * Get the radius color.
+     *
+     * @return Radius color in Color instance form.
+     */
+    public Color getRadiusColor() {
+        return radiusColor;
+    }
+
+    /**
+     * Set the radius color.
+     *
+     * @param radiusColor The radius color.
+     */
+    public void setRadiusColor(Color radiusColor) {
+        this.radiusColor = radiusColor;
+        radiusPaint.setColor(radiusColor);
+        invalidate();
+    }
+
+    /**
+     * Get the boundary width.
+     *
+     * @return Boundary width in int form.
+     */
+    public int getBoundaryWidth() {
+        return boundaryWidth;
+    }
+
+    /**
+     * Set the boundary width.
+     *
+     * @param boundaryWidth The boundary width.
+     */
+    public void setBoundaryWidth(int boundaryWidth) {
+        this.boundaryWidth = boundaryWidth;
+        borderPaint.setStrokeWidth(boundaryWidth);
+        invalidate();
+    }
+
+    /**
      * Get the point radius.
      *
      * @return Point radius in int form.
@@ -1238,41 +1290,43 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
     }
 
     /**
-     * Get the border color.
+     * Return the status of animation (Enabled or Disabled).
      *
-     * @return Border color in Color instance form.
+     * @return true if the status of animation is enabled.
      */
-    public Color getBorderColor() {
-        return borderColor;
+    public boolean isEnabledAnimation() {
+        return enabledAnimation;
     }
 
     /**
-     * Set the border color.
+     * Sets whether animation is enable or not.
+     * It will reset the animation if the status has changed.
      *
-     * @param borderColor The border color.
+     * @param enabledAnimation true if enable
      */
-    public void setBorderColor(Color borderColor) {
-        this.borderColor = borderColor;
-        borderPaint.setColor(borderColor);
+    public void setEnabledAnimation(boolean enabledAnimation) {
+        this.enabledAnimation = enabledAnimation;
         invalidate();
     }
 
     /**
-     * Get the boundary width.
+     * Return the status of showPoint (Enabled or Disabled).
      *
-     * @return Boundary width in int form.
+     * @return true if the status of showPoint is enabled.
      */
-    public int getBoundaryWidth() {
-        return boundaryWidth;
+    public boolean isEnabledShowPoint() {
+        return enabledShowPoint;
     }
 
     /**
-     * Set the boundary width.
+     * Sets whether showPoint is enable or not.
+     * It will reset the view if the status has changed.
      *
-     * @param boundaryWidth The boundary width.
+     * @param enabledShowPoint true if enable
      */
-    public void setBoundaryWidth(int boundaryWidth) {
-        this.boundaryWidth = boundaryWidth;
+    public void setEnabledShowPoint(boolean enabledShowPoint) {
+        this.enabledShowPoint = enabledShowPoint;
+        invalidate();
     }
 
     /**
@@ -1292,26 +1346,6 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
      */
     public void setEnabledPolygon(boolean enabledPolygon) {
         this.enabledPolygon = enabledPolygon;
-        invalidate();
-    }
-
-    /**
-     * Return the status of area outline (Circular or not).
-     *
-     * @return true if the status of area outline is circular.
-     */
-    public boolean isCircle() {
-        return isCircle;
-    }
-
-    /**
-     * Sets whether area outline is circular or not.
-     * It will reset the view if the status has changed.
-     *
-     * @param circle true if area outline is circular.
-     */
-    public void setCircle(boolean circle) {
-        isCircle = circle;
         invalidate();
     }
 
@@ -1376,22 +1410,41 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
     }
 
     /**
-     * Get the single color of area region.
+     * Return the status of area outline (Circular or not).
      *
-     * @return Single color in Color instance form.
+     * @return true if the status of area outline is circular.
      */
-    public Color getSingleColor() {
-        return singleColor;
+    public boolean isEnabledCircularOutline() {
+        return enabledCircularOutline;
     }
 
     /**
-     * Set the single color.
+     * Sets whether area outline is circular or not.
+     * It will reset the view if the status has changed.
      *
-     * @param singleColor The color of area region when multi-color mode is disable.
+     * @param enabledCircularOutline true if area outline is circular.
      */
-    public void setSingleColor(Color singleColor) {
-        this.singleColor = singleColor;
-        singlePaint.setColor(singleColor);
+    public void setEnabledCircularOutline(boolean enabledCircularOutline) {
+        this.enabledCircularOutline = enabledCircularOutline;
+        invalidate();
+    }
+
+    /**
+     * Return the status of region (is draw with multi-color or not).
+     *
+     * @return true if the status region is draw with multi-color.
+     */
+    public boolean isEnabledMultiColorRegion() {
+        return enabledMultiColorRegion;
+    }
+
+    /**
+     * Sets whether region is draw with multi-color.
+     *
+     * @param enabledMultiColorRegion true if region is draw with multi-color.
+     */
+    public void setEnabledMultiColorRegion(boolean enabledMultiColorRegion) {
+        this.enabledMultiColorRegion = enabledMultiColorRegion;
         invalidate();
     }
 
@@ -1413,6 +1466,27 @@ public class XRadarView extends Component implements Component.DrawTask, Compone
     public void setEnabledRegionShader(boolean enabled) {
         this.enabledRegionShader = enabled;
         postLayout();
+        invalidate();
+    }
+
+    /**
+     * Return the status of icons (enabled or disabled).
+     *
+     * @return true if the status of icons is enabled.
+     */
+    public boolean isEnableIcons() {
+        return enableIcons;
+    }
+
+    /**
+     * Set whether icons are enable or not.
+     *
+     * @param enableIcons true if icons is enable.
+     */
+    public void setEnableIcons(boolean enableIcons) {
+        this.enableIcons = enableIcons;
+        drawables = nodeList.stream().map(Node::getIconRef).collect(Collectors.toList())
+                .stream().mapToInt(Integer::intValue).toArray();
         invalidate();
     }
 

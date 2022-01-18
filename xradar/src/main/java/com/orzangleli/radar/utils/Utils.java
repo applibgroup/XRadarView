@@ -15,10 +15,8 @@
  * limitations under the License.
  */
 
-package com.orzangleli.radar;
+package com.orzangleli.radar.utils;
 
-import java.io.IOException;
-import java.util.Optional;
 import ohos.app.Context;
 import ohos.global.resource.NotExistException;
 import ohos.global.resource.RawFileEntry;
@@ -27,6 +25,8 @@ import ohos.global.resource.ResourceManager;
 import ohos.global.resource.WrongTypeException;
 import ohos.media.image.ImageSource;
 import ohos.media.image.PixelMap;
+import java.io.IOException;
+import java.util.Optional;
 
 /**
  * Resource related utils.
@@ -45,20 +45,17 @@ public class Utils {
      * @return the path from id
      */
     public static String getPathById(Context context, int id) {
-        String path = "";
-        if (context == null) {
-            return path;
+        if (context != null) {
+            ResourceManager manager = context.getResourceManager();
+            if (manager != null) {
+                try {
+                    return manager.getMediaPath(id);
+                } catch (IOException | NotExistException | WrongTypeException e) {
+                    return "";
+                }
+            }
         }
-        ResourceManager manager = context.getResourceManager();
-        if (manager == null) {
-            return path;
-        }
-        try {
-            path = manager.getMediaPath(id);
-        } catch (IOException | NotExistException | WrongTypeException e) {
-            path = "";
-        }
-        return path;
+        return "";
     }
 
     /**
@@ -73,6 +70,11 @@ public class Utils {
         if (path == null || path.length() == 0) {
             return Optional.empty();
         }
+
+        if (context == null) {
+            return Optional.empty();
+        }
+
         RawFileEntry assetManager = context.getResourceManager().getRawFileEntry(path);
         ImageSource.SourceOptions options = new ImageSource.SourceOptions();
         options.formatHint = "image/png";

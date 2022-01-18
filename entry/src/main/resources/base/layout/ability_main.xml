@@ -10,8 +10,7 @@
         ohos:width="match_parent"
         ohos:height="360vp"
         ohos:count="7"
-        ohos:enabledBorder="true"
-        ohos:enabledAnimation="true"/>
+        />
 
     <Text
         ohos:width="match_parent"
@@ -25,7 +24,7 @@
     <ScrollView
         ohos:width="match_parent"
         ohos:height="match_parent"
-        ohos:padding="8vp">
+        ohos:margin="8vp">
 
         <DirectionalLayout
             ohos:width="match_parent"

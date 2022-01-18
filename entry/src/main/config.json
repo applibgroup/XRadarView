@@ -17,7 +17,8 @@
     "package": "com.orzangleli.radarview",
     "name": ".MyApplication",
     "deviceType": [
-      "phone"
+      "phone",
+      "tablet"
     ],
     "distro": {
       "deliveryWithInstall": true,

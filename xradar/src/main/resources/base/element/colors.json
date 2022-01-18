@@ -1,0 +1,36 @@
+{
+  "color": [
+    {
+      "name": "start_circle",
+      "value": "#80FFCC33"
+    },
+    {
+      "name": "end_circle",
+      "value": "#80FFFFCC"
+    },
+    {
+      "name": "cobweb",
+      "value": "#80444444"
+    },
+    {
+      "name": "single",
+      "value": "#80CC0000"
+    },
+    {
+      "name": "title",
+      "value": "#80000000"
+    },
+    {
+      "name": "point",
+      "value": "#80333366"
+    },
+    {
+      "name": "border",
+      "value": "#80333366"
+    },
+    {
+      "name": "radius",
+      "value": "#80CCCCCC"
+    }
+  ]
+}
